@@ -1,7 +1,17 @@
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+
 function App() {
   return (
     <>
-      <div>테스트</div>
+      <body className="bg-gray-100">
+        <div className="flex h-screen">
+          <Sidebar />
+          <div className="flex-1 flex flex-col">
+            <Header />
+          </div>
+        </div>
+      </body>
     </>
   );
 }
