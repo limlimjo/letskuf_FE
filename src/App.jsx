@@ -1,15 +1,14 @@
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import RootRoutes from './routes/index.jsx';
+import React from 'react';
 
 function App() {
   return (
     <>
       <body className="bg-gray-100">
         <div className="flex h-screen">
-          <Sidebar />
-          <div className="flex-1 flex flex-col">
-            <Header />
-          </div>
+          <React.StrictMode>
+            <RootRoutes />
+          </React.StrictMode>
         </div>
       </body>
     </>
