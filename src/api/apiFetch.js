@@ -1,5 +1,11 @@
 import { SERVER_URL } from '../config';
 
+export function getQueryString(params) {
+  return `?${Object.entries(params)
+    .map(e => e.join('='))
+    .join('&')}`;
+}
+
 export function requestFetch(url, requestOptions, handler, errorHandler) {
   console.log('requestFetch');
   console.log(SERVER_URL + url);
