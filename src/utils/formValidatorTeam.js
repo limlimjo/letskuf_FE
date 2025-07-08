@@ -1,4 +1,4 @@
-const formValidator = formData => {
+const formValidatorTeam = formData => {
   if (formData.get('teamNm') === null || formData.get('teamNm') === '') {
     alert('팀명을 입력하세요.');
     return false;
@@ -26,4 +26,4 @@ const formValidator = formData => {
   return true;
 };
 
-export default formValidator;
+export default formValidatorTeam;

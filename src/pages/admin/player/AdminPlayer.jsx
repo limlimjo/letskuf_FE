@@ -3,7 +3,7 @@ import * as ApiFetch from '../../../api/apiFetch';
 import Pagination from '../../../components/Pagination';
 import { useLocation } from 'react-router-dom';
 
-const AdminTeam = () => {
+const AdminPlayer = () => {
   const location = useLocation();
 
   const [searchCondition, setSearchCondition] = useState(
@@ -19,7 +19,7 @@ const AdminTeam = () => {
       console.log('useCallback 시작');
 
       const retrieveListURL =
-        '/api/retrieveTeam.do' + ApiFetch.getQueryString(srchCond);
+        '/api/retrievePlayer.do' + ApiFetch.getQueryString(srchCond);
       const requestOptions = {
         method: 'GET',
         headers: {
@@ -44,15 +44,12 @@ const AdminTeam = () => {
 
           mutListTag.push(
             <tr className="border-b border-gray-200">
-              <td className="px-6 py-4">{item.teamId}</td>
+              <td className="px-6 py-4">{item.playerId}</td>
+              <td className="px-6 py-4">{item.name}</td>
               <td className="px-6 py-4">{item.teamNm}</td>
-              <td className="px-6 py-4">{item.regionNm}</td>
-              <td className="px-6 py-4">{item.coachNm}</td>
-              <td className="px-6 py-4">
-                <span className="bg-green-100 text-green-800 px-2 py-0.5 text-xs rounded-full font-semibold">
-                  수정
-                </span>
-              </td>
+              <td className="px-6 py-4">{item.position}</td>
+              <td className="px-6 py-4">{item.uniformNum}</td>
+              <td className="px-6 py-4">{item.grade}</td>
             </tr>,
           );
         });
@@ -60,7 +57,7 @@ const AdminTeam = () => {
         if (!mutListTag.length) {
           mutListTag.push(
             <tr className="border-b border-gray-200">
-              <td colSpan={5} className="py-8 text-center text-gray-500">
+              <td colSpan={6} className="py-8 text-center text-gray-500">
                 검색결과가 없습니다.
               </td>
             </tr>,
@@ -79,7 +76,7 @@ const AdminTeam = () => {
   return (
     <main className="flex-1 bg-gray-200">
       <div className="container mx-auto px-10 py-8">
-        <h3 className="text-gray-700 text-3xl font-bold">팀 목록</h3>
+        <h3 className="text-gray-700 text-3xl font-bold">선수단 목록</h3>
         <div className="relative mt-6">
           <span className="absolute left-0 inset-y-0 pl-3 flex items-center">
             <i className="fas fa-search" />
@@ -95,10 +92,11 @@ const AdminTeam = () => {
               <thead>
                 <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                   <th className="px-6 py-3 font-medium">No.</th>
-                  <th className="px-6 py-3 font-medium">팀명</th>
-                  <th className="px-6 py-3 font-medium">지역</th>
-                  <th className="px-6 py-3 font-medium">감독</th>
-                  <th className="px-6 py-3 font-medium">수정</th>
+                  <th className="px-6 py-3 font-medium">이름</th>
+                  <th className="px-6 py-3 font-medium">소속</th>
+                  <th className="px-6 py-3 font-medium">포지션</th>
+                  <th className="px-6 py-3 font-medium">배번</th>
+                  <th className="px-6 py-3 font-medium">학년</th>
                 </tr>
               </thead>
               <tbody className="bg-white text-gray-900 text-sm text-center font-medium">
@@ -121,4 +119,4 @@ const AdminTeam = () => {
   );
 };
 
-export default AdminTeam;
+export default AdminPlayer;

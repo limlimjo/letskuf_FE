@@ -31,18 +31,18 @@ const LeftMenuAdmin = () => {
         </div>
         <div className="flex flex-col">
           <p className="text-xl font-bold py-1.5 px-4 rounded">선수단 관리</p>
-          <a
-            href="#"
+          <NavLink
+            to={URL.ADMIN_PLAYER}
             className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
           >
             선수단 목록
-          </a>
-          <a
-            href="#"
+          </NavLink>
+          <NavLink
+            to={URL.ADMIN_PLAYER_CREATE}
             className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
           >
             선수단 등록
-          </a>
+          </NavLink>
         </div>
         <div className="flex flex-col">
           <p className="text-xl font-bold py-1.5 px-4 rounded">

@@ -118,20 +118,6 @@ const Pagination = props => {
   }
 
   return (
-    // <div className="flex justify-center items-center mt-6 space-x-2">
-    //   <button
-    //     className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
-    //     disabled
-    //   >
-    //     이전
-    //   </button>
-    //   <button className="px-3 py-1 rounded bg-gray-800 text-white">1</button>
-    //   <button className="px-3 py-1 rounded bg-gray-200">2</button>
-    //   <button className="px-3 py-1 rounded bg-gray-200">3</button>
-    //   <button className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">
-    //     다음
-    //   </button>
-    // </div>
     <div>
       <ul className="flex justify-center items-center mt-6 space-x-2">
         {paginationTag}

@@ -4,7 +4,7 @@ import Button from '../../../components/Button';
 import { useNavigate } from 'react-router-dom';
 import URL from '../../../constants/url';
 import * as ApiFetch from '../../../api/apiFetch';
-import formValidator from '../../../utils/formValidator';
+import formValidatorTeam from '../../../utils/formValidatorTeam';
 
 const AdminTeamEdit = props => {
   console.log('props 확인 : ', props);
@@ -108,7 +108,7 @@ const AdminTeamEdit = props => {
     }
 
     // 유효성 검사
-    if (formValidator(formData)) {
+    if (formValidatorTeam(formData)) {
       console.log('formData 출력');
       console.log(formData);
       const requestOptions = {
@@ -141,8 +141,8 @@ const AdminTeamEdit = props => {
         </h3>
         <div className="mt-8">
           <div className="shadow rounded-lg overflow-hidden border-b border-gray-200">
-            <table className="w-full">
-              <tbody className="bg-white text-gray-900 text-sm font-medium">
+            <table className="w-full bg-white">
+              <tbody className="text-gray-900 text-sm font-medium">
                 <tr className="border-b border-gray-200">
                   <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
                     팀명
