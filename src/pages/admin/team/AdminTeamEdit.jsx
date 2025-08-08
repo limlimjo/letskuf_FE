@@ -28,7 +28,7 @@ const AdminTeamEdit = props => {
         setModeInfo({
           ...modeInfo,
           modeTitle: '수정',
-          editURL: `/admin/team/modify/${props.teamId}`,
+          editURL: `/admin/team/${props.teamId}/modify`,
         });
         break;
     }
@@ -91,6 +91,7 @@ const AdminTeamEdit = props => {
     console.log('등록 버튼');
     const formData = new FormData();
     for (let key in teamInfo) {
+      if (key === 'teamId') continue; // teamId는 루프에서 제외
       if (key === 'teamFile') {
         if (teamInfo[key].length > 0) {
           // 파일이 있을 때
@@ -111,13 +112,23 @@ const AdminTeamEdit = props => {
     if (formValidatorTeam(formData)) {
       console.log('formData 출력');
       console.log(formData);
+
+      let apiUrl = '';
+      if (modeInfo.mode === CODE.MODE_CREATE) {
+        apiUrl = '/api/registerTeam.do';
+      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+        apiUrl = '/api/updateTeam.do';
+        console.log('props.teamId : ', props.teamId);
+        formData.append('teamId', props.teamId); // 수정 모드일 때 팀 ID 추가
+      }
+
       const requestOptions = {
         method: 'POST',
         body: formData,
       };
 
       // API 호출
-      ApiFetch.requestFetch('/api/registerTeam.do', requestOptions, resp => {
+      ApiFetch.requestFetch(apiUrl, requestOptions, resp => {
         console.log('api 호출');
         console.log(resp);
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
@@ -129,8 +140,34 @@ const AdminTeamEdit = props => {
     }
   };
 
+  // 팀 정보 조회 (수정 모드일 때)
+  const fetchTeamInfo = async () => {
+    try {
+      console.log('팀 정보 조회 시작');
+      ApiFetch.requestFetch(
+        `/api/retrieveUpdateTeamDetail.do?teamId=${props.teamId}`,
+        { method: 'GET' },
+        resp => {
+          if (resp && resp.result) {
+            setTeamInfo({
+              ...resp.result.team,
+              teamFile: [],
+              originalFileName: resp.result.teamFile?.originalFileName || '', // 파일명만 저장
+              storedFileName: resp.result.teamFile?.storedFileName || '', // 이미지 URL 저장
+            });
+          }
+        },
+      );
+    } catch (e) {
+      alert('팀 정보를 불러오지 못했습니다.');
+    }
+  };
+
   useEffect(() => {
     initMode();
+    if (props.mode === CODE.MODE_MODIFY && props.teamId) {
+      fetchTeamInfo();
+    }
   }, []);
 
   return (
@@ -255,16 +292,51 @@ const AdminTeamEdit = props => {
                     사진 첨부
                   </th>
                   <td className="px-6 py-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
-                    {teamInfo.teamFile && teamInfo.teamFile.length > 0 && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        선택된 파일: {teamInfo.teamFile[0].name}
-                      </p>
+                    <label className="inline-block cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
+                      파일 선택
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                    {teamInfo.teamFile && teamInfo.teamFile.length > 0 ? (
+                      <span className="ml-3 text-sm text-gray-600">
+                        {teamInfo.teamFile[0].name}
+                      </span>
+                    ) : teamInfo.originalFileName ? (
+                      <span className="ml-3 text-xs text-gray-500">
+                        현재 등록된 이미지가 있습니다.
+                      </span>
+                    ) : (
+                      <span className="ml-3 text-sm text-gray-400">
+                        선택된 파일 없음
+                      </span>
                     )}
+                    {teamInfo.teamFile && teamInfo.teamFile.length > 0 ? (
+                      <div className="mt-2">
+                        <img
+                          src=""
+                          alt="선택된 이미지"
+                          className="w-32 h-32 object-cover rounded border mb-1"
+                        />
+                        <p className="text-sm text-gray-600">
+                          선택된 파일: {teamInfo.teamFile[0].name}
+                        </p>
+                      </div>
+                    ) : teamInfo.originalFileName ? (
+                      <div className="mt-2">
+                        <img
+                          src={teamInfo.storedFileName}
+                          alt={teamInfo.originalFileName}
+                          className="w-32 h-32 object-cover rounded border mb-1"
+                        />
+                        <p className="text-xs text-gray-500">
+                          현재 등록된 이미지
+                        </p>
+                      </div>
+                    ) : null}
                   </td>
                 </tr>
               </tbody>

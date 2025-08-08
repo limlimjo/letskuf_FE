@@ -35,7 +35,13 @@ const LeftMenuAdmin = () => {
             to={URL.ADMIN_PLAYER}
             className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
           >
-            선수단 목록
+            선수단 목록 (선수)
+          </NavLink>
+          <NavLink
+            to={URL.ADMIN_PLAYER_STAFF}
+            className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
+          >
+            선수단 목록 (코칭스태프/임원)
           </NavLink>
           <NavLink
             to={URL.ADMIN_PLAYER_CREATE}
@@ -48,18 +54,18 @@ const LeftMenuAdmin = () => {
           <p className="text-xl font-bold py-1.5 px-4 rounded">
             리그/대회 관리
           </p>
-          <a
-            href="#"
+          <NavLink
+            to={URL.ADMIN_LEAGUE}
             className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
           >
             리그/대회 목록
-          </a>
-          <a
-            href="#"
+          </NavLink>
+          <NavLink
+            to={URL.ADMIN_LEAGUE_CREATE}
             className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
           >
             리그/대회 등록
-          </a>
+          </NavLink>
         </div>
         <div className="flex flex-col">
           <p className="text-xl font-bold py-1.5 px-4 rounded">경기 관리</p>

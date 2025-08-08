@@ -1,12 +1,13 @@
 const URL = {
   //ADMIN-TEAM
   ADMIN_TEAM: '/admin/team',
-  ADMIN_TEAM_DETAIL: '/admin/team/detail',
+  ADMIN_TEAM_DETAIL: '/admin/team/:teamId',
   ADMIN_TEAM_CREATE: '/admin/team/create',
-  ADMIN_TEAM_MODIFY: '/admin/team/modify',
+  ADMIN_TEAM_MODIFY: '/admin/team/:teamId/modify',
 
   //ADMIN-PLAYER
   ADMIN_PLAYER: '/admin/player',
+  ADMIN_PLAYER_STAFF: '/admin/player/staff',
   ADMIN_PLAYER_DETAIL: '/admin/player/detail',
   ADMIN_PLAYER_CREATE: '/admin/player/create',
   ADMIN_PLAYER_MODIFY: '/admin/player/modify',

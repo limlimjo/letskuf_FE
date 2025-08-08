@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as ApiFetch from '../../../api/apiFetch';
 import Pagination from '../../../components/Pagination';
-import { Link, useLocation } from 'react-router-dom';
-import CODE from '../../../constants/code';
+import { useLocation } from 'react-router-dom';
+import Button from '../../../components/Button';
 
-const AdminTeam = () => {
+const AdminLeague = () => {
   const location = useLocation();
 
   const [searchCondition, setSearchCondition] = useState(
     location.state?.searchCondition || {
       pageIndex: 1,
     },
-  ); // 기존 조회에서 접근 했을 시 || 신규로 접근 했을 시
+  );
+
+  const [tabType, setTabType] = useState('LEAGUE');
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
 
@@ -19,8 +21,10 @@ const AdminTeam = () => {
     srchCond => {
       console.log('useCallback 시작');
 
+      const params = { ...srchCond, type: tabType };
+
       const retrieveListURL =
-        '/api/retrieveTeam.do' + ApiFetch.getQueryString(srchCond);
+        '/api/retrieveLeague.do' + ApiFetch.getQueryString(params);
       const requestOptions = {
         method: 'GET',
         headers: {
@@ -45,33 +49,11 @@ const AdminTeam = () => {
 
           mutListTag.push(
             <tr className="border-b border-gray-200">
-              <td className="px-6 py-4">{item.teamId}</td>
+              <td className="px-6 py-4">{item.no}</td>
+              <td className="px-6 py-4">{item.name}</td>
+              <td className="px-6 py-4">{item.region}</td>
               <td className="px-6 py-4">
-                {' '}
-                <Link
-                  to={`/admin/team/${item.teamId}`}
-                  className="hover:underline"
-                >
-                  {item.teamNm}
-                </Link>
-              </td>
-              <td className="px-6 py-4">{item.regionNm}</td>
-              <td className="px-6 py-4">{item.coachNm}</td>
-              <td className="px-6 py-4">
-                <Link
-                  to={`/admin/team/${item.teamId}/modify`}
-                  className="bg-green-100 text-green-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-green-200 transition"
-                >
-                  수정
-                </Link>
-              </td>
-              <td className="px-6 py-4">
-                <button
-                  onClick={() => handleOnDelete(item.teamId)}
-                  className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-red-200 transition"
-                >
-                  삭제
-                </button>
+                {item.startDate} ~ {item.endDate}
               </td>
             </tr>,
           );
@@ -80,7 +62,7 @@ const AdminTeam = () => {
         if (!mutListTag.length) {
           mutListTag.push(
             <tr className="border-b border-gray-200">
-              <td colSpan={5} className="py-8 text-center text-gray-500">
+              <td colSpan={6} className="py-8 text-center text-gray-500">
                 검색결과가 없습니다.
               </td>
             </tr>,
@@ -89,41 +71,39 @@ const AdminTeam = () => {
         setListTag(mutListTag);
       });
     },
-    [searchCondition],
-  );
-
-  // 삭제 버튼 클릭 핸들러
-  const handleOnDelete = useCallback(
-    teamId => {
-      if (!window.confirm('정말 삭제하시겠습니까?')) return;
-      const deleteUrl = `/api/deleteTeam.do?teamId=${teamId}`;
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
-      ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
-        console.log('삭제 결과:', resp);
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          alert('삭제되었습니다.');
-          retrieveList(searchCondition); // 삭제 후 리스트 갱신
-        } else {
-          alert('삭제에 실패했습니다. 다시 시도해주세요.');
-        }
-      });
-    },
-    [retrieveList, searchCondition],
+    [tabType, searchCondition],
   );
 
   useEffect(() => {
     retrieveList(searchCondition);
-  }, []);
+  }, [tabType]);
 
   return (
     <main className="flex-1 bg-gray-200">
       <div className="container mx-auto px-10 py-8">
-        <h3 className="text-gray-700 text-3xl font-bold">팀 목록</h3>
+        <h3 className="text-gray-700 text-3xl font-bold">리그/대회 목록</h3>
+        <div className="mt-8 flex gap-4">
+          <Button
+            className={`flex-1 py-2 ${
+              tabType === 'LEAGUE'
+                ? 'bg-black text-white font-bold'
+                : 'bg-gray-100 text-black'
+            }`}
+            onClick={() => setTabType('LEAGUE')}
+          >
+            리그
+          </Button>
+          <Button
+            className={`flex-1 py-2 ${
+              tabType === 'TOURNAMENT'
+                ? 'bg-black text-white font-bold'
+                : 'bg-gray-100 text-black'
+            }`}
+            onClick={() => setTabType('TOURNAMENT')}
+          >
+            대회
+          </Button>
+        </div>
         <div className="relative mt-6">
           <span className="absolute left-0 inset-y-0 pl-3 flex items-center">
             <i className="fas fa-search" />
@@ -139,11 +119,11 @@ const AdminTeam = () => {
               <thead>
                 <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                   <th className="px-6 py-3 font-medium">No.</th>
-                  <th className="px-6 py-3 font-medium">팀명</th>
+                  <th className="px-6 py-3 font-medium">
+                    {tabType === 'LEAGUE' ? '리그명' : '대회명'}
+                  </th>
                   <th className="px-6 py-3 font-medium">지역</th>
-                  <th className="px-6 py-3 font-medium">감독</th>
-                  <th className="px-6 py-3 font-medium">수정</th>
-                  <th className="px-6 py-3 font-medium">삭제</th>
+                  <th className="px-6 py-3 font-medium">기간</th>
                 </tr>
               </thead>
               <tbody className="bg-white text-gray-900 text-sm text-center font-medium">
@@ -166,4 +146,4 @@ const AdminTeam = () => {
   );
 };
 
-export default AdminTeam;
+export default AdminLeague;

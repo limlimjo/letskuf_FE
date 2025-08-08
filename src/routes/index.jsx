@@ -10,6 +10,15 @@ import AdminTeamEdit from '../pages/admin/team/AdminTeamEdit';
 import AdminPlayer from '../pages/admin/player/AdminPlayer';
 import AdminPlayerDetail from '../pages/admin/player/AdminPlayerDetail';
 import AdminPlayerEdit from '../pages/admin/player/AdminPlayerEdit';
+import AdminPlayerStaff from '../pages/admin/player/AdminPlayerStaff';
+import AdminLeagueEdit from '../pages/admin/league/AdminLeagueEdit';
+import AdminLeague from '../pages/admin/league/AdminLeague';
+import { useParams } from 'react-router-dom';
+
+function AdminTeamEditWithParams(props) {
+  const { teamId } = useParams();
+  return <AdminTeamEdit mode={CODE.MODE_MODIFY} teamId={teamId} {...props} />;
+}
 
 const RootRoutes = () => {
   return (
@@ -26,9 +35,10 @@ const RootRoutes = () => {
           />
           <Route
             path={URL.ADMIN_TEAM_MODIFY}
-            element={<AdminTeamEdit mode={CODE.MODE_MODIFY} />}
+            element={<AdminTeamEditWithParams />}
           />
           <Route path={URL.ADMIN_PLAYER} element={<AdminPlayer />} />
+          <Route path={URL.ADMIN_PLAYER_STAFF} element={<AdminPlayerStaff />} />
           <Route
             path={URL.ADMIN_PLAYER_DETAIL}
             element={<AdminPlayerDetail />}
@@ -40,6 +50,15 @@ const RootRoutes = () => {
           <Route
             path={URL.ADMIN_PLAYER_MODIFY}
             element={<AdminPlayerEdit mode={CODE.MODE_MODIFY} />}
+          />
+          <Route path={URL.ADMIN_LEAGUE} element={<AdminLeague />} />
+          <Route
+            path={URL.ADMIN_LEAGUE_CREATE}
+            element={<AdminLeagueEdit mode={CODE.MODE_CREATE} />}
+          />
+          <Route
+            path={URL.ADMIN_LEAGUE_MODIFY}
+            element={<AdminLeagueEdit mode={CODE.MODE_MODIFY} />}
           />
         </Routes>
       </div>

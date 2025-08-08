@@ -5,7 +5,7 @@ const Pagination = props => {
   let paginationTag = [];
 
   if (props.pagination === undefined) {
-    paginationTag = '-';
+    paginationTag = '';
   } else {
     const currentPageNo = props.pagination.currentPageNo;
     const pageSize = props.pagination.pageSize;

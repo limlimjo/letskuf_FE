@@ -90,10 +90,22 @@ const AdminPlayerEdit = props => {
       ApiFetch.requestFetch(apiUrl, requestOptions, resp => {
         console.log('api 호출');
         console.log(resp);
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          navigate({ pathname: URL.ADMIN_PLAYER });
-        } else {
-          console.error('error');
+        if (playerInfo.typeGbn === '1') {
+          // 선수 등록/수정
+          //console.log('선수 등록/수정 완료');
+          if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+            navigate({ pathname: URL.ADMIN_PLAYER });
+          } else {
+            console.error('error');
+          }
+        } else if (playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') {
+          // 코칭스태프/임원 등록/수정
+          //console.log('코칭스태프/임원 등록/수정 완료');
+          if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+            navigate({ pathname: URL.ADMIN_PLAYER_STAFF });
+          } else {
+            console.error('error');
+          }
         }
       });
     }

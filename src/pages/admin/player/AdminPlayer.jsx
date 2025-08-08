@@ -10,7 +10,8 @@ const AdminPlayer = () => {
     location.state?.searchCondition || {
       pageIndex: 1,
     },
-  ); // 기존 조회에서 접근 했을 시 || 신규로 접근 했을 시
+  );
+
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
 
@@ -66,7 +67,7 @@ const AdminPlayer = () => {
         setListTag(mutListTag);
       });
     },
-    [listTag, searchCondition],
+    [searchCondition],
   );
 
   useEffect(() => {
@@ -76,7 +77,7 @@ const AdminPlayer = () => {
   return (
     <main className="flex-1 bg-gray-200">
       <div className="container mx-auto px-10 py-8">
-        <h3 className="text-gray-700 text-3xl font-bold">선수단 목록</h3>
+        <h3 className="text-gray-700 text-3xl font-bold">선수단 목록 (선수)</h3>
         <div className="relative mt-6">
           <span className="absolute left-0 inset-y-0 pl-3 flex items-center">
             <i className="fas fa-search" />
