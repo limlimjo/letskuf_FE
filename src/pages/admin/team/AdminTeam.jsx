@@ -57,15 +57,13 @@ const AdminTeam = () => {
               </td>
               <td className="px-6 py-4">{item.regionNm}</td>
               <td className="px-6 py-4">{item.coachNm}</td>
-              <td className="px-6 py-4">
+              <td className="px-6 py-4" colSpan={2}>
                 <Link
                   to={`/admin/team/${item.teamId}/modify`}
-                  className="bg-green-100 text-green-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-green-200 transition"
+                  className="bg-green-100 text-green-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-green-200 transition mr-2"
                 >
                   수정
                 </Link>
-              </td>
-              <td className="px-6 py-4">
                 <button
                   onClick={() => handleOnDelete(item.teamId)}
                   className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-red-200 transition"
@@ -142,8 +140,9 @@ const AdminTeam = () => {
                   <th className="px-6 py-3 font-medium">팀명</th>
                   <th className="px-6 py-3 font-medium">지역</th>
                   <th className="px-6 py-3 font-medium">감독</th>
-                  <th className="px-6 py-3 font-medium">수정</th>
-                  <th className="px-6 py-3 font-medium">삭제</th>
+                  <th className="px-6 py-3 font-medium" colSpan={2}>
+                    관리
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white text-gray-900 text-sm text-center font-medium">

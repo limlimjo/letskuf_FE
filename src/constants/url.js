@@ -8,19 +8,20 @@ const URL = {
   //ADMIN-PLAYER
   ADMIN_PLAYER: '/admin/player',
   ADMIN_PLAYER_STAFF: '/admin/player/staff',
-  ADMIN_PLAYER_DETAIL: '/admin/player/detail',
+  ADMIN_PLAYER_DETAIL: '/admin/player/:playerId',
   ADMIN_PLAYER_CREATE: '/admin/player/create',
-  ADMIN_PLAYER_MODIFY: '/admin/player/modify',
+  ADMIN_PLAYER_MODIFY: '/admin/player/:playerId/modify',
+  ADMIN_PLAYER_STAFF_MODIFY: '/admin/player/staff/:coachId/modify',
 
   //ADMIN-LEAGUE
   ADMIN_LEAGUE: '/admin/league',
-  ADMIN_LEAGUE_DETAIL: '/admin/league/detail',
+  ADMIN_LEAGUE_DETAIL: '/admin/league/:leagueId',
   ADMIN_LEAGUE_CREATE: '/admin/league/create',
   ADMIN_LEAGUE_MODIFY: '/admin/league/modify',
 
   //ADMIN-MATCH
   ADMIN_MATCH: '/admin/match',
-  ADMIN_MATCH_DETAIL: '/admin/match/detail',
+  ADMIN_MATCH_DETAIL: '/admin/match/:matchId',
   ADMIN_MATCH_CREATE: '/admin/match/create',
   ADMIN_MATCH_MODIFY: '/admin/match/modify',
 };

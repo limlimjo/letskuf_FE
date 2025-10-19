@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as ApiFetch from '../../../api/apiFetch';
 import Pagination from '../../../components/Pagination';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import CODE from '../../../constants/code';
 
 const AdminPlayerStaff = () => {
   const location = useLocation();
@@ -50,6 +51,20 @@ const AdminPlayerStaff = () => {
               <td className="px-6 py-4">{item.teamNm}</td>
               <td className="px-6 py-4">{item.birthDate}</td>
               <td className="px-6 py-4">{item.title}</td>
+              <td className="px-6 py-4" colSpan={2}>
+                <Link
+                  to={`/admin/player/staff/${item.coachId}/modify`}
+                  className="bg-green-100 text-green-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-green-200 transition mr-2"
+                >
+                  수정
+                </Link>
+                <button
+                  onClick={() => handleOnDelete(item.coachId)}
+                  className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-red-200 transition"
+                >
+                  삭제
+                </button>
+              </td>
             </tr>,
           );
         });
@@ -67,6 +82,30 @@ const AdminPlayerStaff = () => {
       });
     },
     [listTag, searchCondition],
+  );
+
+  // 삭제 버튼 클릭 핸들러
+  const handleOnDelete = useCallback(
+    coachId => {
+      if (!window.confirm('정말 삭제하시겠습니까?')) return;
+      const deleteUrl = `/api/deleteCoach.do?coachId=${coachId}`;
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+      };
+      ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
+        console.log('삭제 결과:', resp);
+        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+          alert('삭제되었습니다.');
+          retrieveList(searchCondition); // 삭제 후 리스트 갱신
+        } else {
+          alert('삭제에 실패했습니다. 다시 시도해주세요.');
+        }
+      });
+    },
+    [retrieveList, searchCondition],
   );
 
   useEffect(() => {
@@ -98,6 +137,9 @@ const AdminPlayerStaff = () => {
                   <th className="px-6 py-3 font-medium">소속</th>
                   <th className="px-6 py-3 font-medium">생년월일</th>
                   <th className="px-6 py-3 font-medium">직책</th>
+                  <th className="px-6 py-3 font-medium" colSpan={2}>
+                    관리
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white text-gray-900 text-sm text-center font-medium">

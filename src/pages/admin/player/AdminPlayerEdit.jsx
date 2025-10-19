@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CODE from '../../../constants/code';
 import Button from '../../../components/Button';
 import { useNavigate } from 'react-router-dom';
@@ -46,7 +46,11 @@ const AdminPlayerEdit = props => {
 
   // 취소 버튼 클릭
   const handleOnCancel = () => {
-    navigate({ pathname: URL.ADMIN_PLAYER });
+    if (props.playerId) {
+      navigate({ pathname: URL.ADMIN_PLAYER });
+    } else if (props.coachId) {
+      navigate({ pathname: URL.ADMIN_PLAYER_STAFF });
+    }
   };
 
   // 등록/수정 버튼 클릭
@@ -54,6 +58,8 @@ const AdminPlayerEdit = props => {
     console.log('등록 버튼');
     const formData = new FormData();
     for (let key in playerInfo) {
+      if (key === 'playerId') continue; // playerId는 루프에서 제외
+      if (key === 'coachId') continue; // coachId는 루프에서 제외
       if (key === 'file') {
         if (playerInfo[key].length > 0) {
           // 파일이 있을 때
@@ -74,11 +80,22 @@ const AdminPlayerEdit = props => {
     if (formValidatorCoach(formData, playerInfo.typeGbn)) {
       console.log('formData 출력');
       console.log(formData);
-      let apiUrl = '/api/registerPlayer.do';
-      if (playerInfo.typeGbn === '1') {
-        apiUrl = '/api/registerPlayer.do';
-      } else if (playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') {
-        apiUrl = '/api/registerCoach.do';
+
+      let apiUrl = '';
+      if (modeInfo.mode === CODE.MODE_CREATE) {
+        if (playerInfo.typeGbn === '1') {
+          apiUrl = '/api/registerPlayer.do';
+        } else if (playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') {
+          apiUrl = '/api/registerCoach.do';
+        }
+      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+        if (playerInfo.typeGbn === '1') {
+          apiUrl = '/api/updatePlayer.do';
+          formData.append('playerId', props.playerId);
+        } else if (playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') {
+          apiUrl = '/api/updateCoach.do';
+          formData.append('coachId', props.coachId);
+        }
       }
 
       const requestOptions = {
@@ -111,6 +128,53 @@ const AdminPlayerEdit = props => {
     }
   };
 
+  // 선수 정보 조회 (수정 모드일 때)
+  const fetchPlayerInfo = async () => {
+    try {
+      console.log('선수 정보 조회 시작');
+      ApiFetch.requestFetch(
+        `/api/retrieveUpdatePlayerDetail.do?playerId=${props.playerId}`,
+        { method: 'GET' },
+        resp => {
+          if (resp && resp.result) {
+            setPlayerInfo({
+              ...resp.result.player,
+              file: [],
+              originalFileName: resp.result.file?.originalFileName || '', // 파일명만 저장
+              storedFileName: resp.result.file?.storedFileName || '', // 이미지 URL 저장
+            });
+          }
+        },
+      );
+      console.log('playerInfo 출력:', playerInfo);
+    } catch (e) {
+      alert('선수 정보를 불러오지 못했습니다.');
+    }
+  };
+
+  // 코칭스태프/임원 정보 조회 (수정 모드일 때)
+  const fetchStaffInfo = async () => {
+    try {
+      console.log('코칭스태프/임원 정보 조회 시작');
+      ApiFetch.requestFetch(
+        `/api/retrieveUpdateCoachDetail.do?coachId=${props.coachId}`,
+        { method: 'GET' },
+        resp => {
+          if (resp && resp.result) {
+            setPlayerInfo({
+              ...resp.result.coach,
+              file: [],
+              originalFileName: resp.result.file?.originalFileName || '', // 파일명만 저장
+              storedFileName: resp.result.file?.storedFileName || '', // 이미지 URL 저장
+            });
+          }
+        },
+      );
+    } catch (e) {
+      alert('코칭스태프/임원 정보를 불러오지 못했습니다.');
+    }
+  };
+
   // 팀 목록 조회
   useEffect(() => {
     ApiFetch.requestFetch(
@@ -132,6 +196,11 @@ const AdminPlayerEdit = props => {
 
   useEffect(() => {
     initMode();
+    if (props.mode === CODE.MODE_MODIFY && props.playerId) {
+      fetchPlayerInfo();
+    } else if (props.mode === CODE.MODE_MODIFY && props.coachId) {
+      fetchStaffInfo();
+    }
   }, []);
 
   return (
@@ -268,6 +337,7 @@ const AdminPlayerEdit = props => {
                           title: '',
                         }))
                       }
+                      disabled={props.mode === CODE.MODE_MODIFY}
                     >
                       <option value="">선택</option>
                       <option value="1">선수</option>
@@ -422,16 +492,51 @@ const AdminPlayerEdit = props => {
                     사진 첨부
                   </th>
                   <td className="px-6 py-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
-                    {playerInfo.teamFile && playerInfo.teamFile.length > 0 && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        선택된 파일: {playerInfo.teamFile[0].name}
-                      </p>
+                    <label className="inline-block cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
+                      파일 선택
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                    {playerInfo.file && playerInfo.file.length > 0 ? (
+                      <span className="ml-3 text-sm text-gray-600">
+                        {playerInfo.file[0].name}
+                      </span>
+                    ) : playerInfo.originalFileName ? (
+                      <span className="ml-3 text-xs text-gray-500">
+                        현재 등록된 이미지가 있습니다.
+                      </span>
+                    ) : (
+                      <span className="ml-3 text-sm text-gray-400">
+                        선택된 파일 없음
+                      </span>
                     )}
+                    {playerInfo.file && playerInfo.file.length > 0 ? (
+                      <div className="mt-2">
+                        <img
+                          src=""
+                          alt="선택된 이미지"
+                          className="w-32 h-32 object-cover rounded border mb-1"
+                        />
+                        <p className="text-sm text-gray-600">
+                          선택된 파일: {playerInfo.file[0].name}
+                        </p>
+                      </div>
+                    ) : playerInfo.originalFileName ? (
+                      <div className="mt-2">
+                        <img
+                          src={playerInfo.storedFileName}
+                          alt={playerInfo.originalFileName}
+                          className="w-32 h-32 object-cover rounded border mb-1"
+                        />
+                        <p className="text-xs text-gray-500">
+                          현재 등록된 이미지
+                        </p>
+                      </div>
+                    ) : null}
                   </td>
                 </tr>
               </tbody>
