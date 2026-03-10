@@ -8,11 +8,11 @@ import Select from 'react-select';
 import formValidatorCoach from '../../../utils/formValidatorCoach';
 
 const AdminPlayerEdit = props => {
-  console.log('props 확인 : ', props);
-
   const [modeInfo, setModeInfo] = useState({ mode: props.mode });
   const [teamOptions, setTeamOptions] = useState([]);
   const [playerInfo, setPlayerInfo] = useState({ file: [] });
+  const [preview, setPreview] = useState(null);
+
   const navigate = useNavigate();
 
   const initMode = () => {
@@ -21,16 +21,16 @@ const AdminPlayerEdit = props => {
         setModeInfo({
           ...modeInfo,
           modeTitle: '등록',
-          editURL: '/admin/player/create',
         });
+
         break;
 
       case CODE.MODE_MODIFY:
         setModeInfo({
           ...modeInfo,
           modeTitle: '수정',
-          editURL: `/admin/player/modify/${props.playerId}`,
         });
+
         break;
     }
   };
@@ -42,6 +42,9 @@ const AdminPlayerEdit = props => {
       ...prev,
       file: file ? [file] : [],
     }));
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
   // 취소 버튼 클릭
@@ -50,6 +53,8 @@ const AdminPlayerEdit = props => {
       navigate({ pathname: URL.ADMIN_PLAYER });
     } else if (props.coachId) {
       navigate({ pathname: URL.ADMIN_PLAYER_STAFF });
+    } else {
+      navigate({ pathname: URL.ADMIN_PLAYER });
     }
   };
 
@@ -204,24 +209,32 @@ const AdminPlayerEdit = props => {
   }, []);
 
   return (
-    <main className="flex-1 bg-gray-200">
-      <div className="container mx-auto px-10 py-8">
+    <main className="bg-gray-200 min-h-screen">
+      <div className="max-w-[1140px] px-10 py-8">
         <h3 className="text-gray-700 text-3xl font-bold">
           선수단 {modeInfo.mode === CODE.MODE_CREATE ? '등록' : '수정'}
         </h3>
+
         <div className="mt-8">
-          <div className="shadow rounded-lg overflow-hidden border-b border-gray-200">
-            <table className="w-full bg-white">
+          <div className="shadow rounded-lg border border-gray-200 overflow-hidden">
+            <table className="w-full table-fixed bg-white">
+              <colgroup>
+                <col className="w-40" />
+                <col />
+                <col className="w-40" />
+                <col />
+              </colgroup>
               <tbody className="text-gray-900 text-sm font-medium">
+                {/* 이름 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     이름
                   </th>
-                  <td className="px-6 py-4">
+
+                  <td colSpan={3} className="px-6 py-4">
                     <input
-                      className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-64 px-3 bg-gray-100 rounded"
                       type="text"
-                      required
                       value={playerInfo.name || ''}
                       onChange={e =>
                         setPlayerInfo(prev => ({
@@ -232,13 +245,16 @@ const AdminPlayerEdit = props => {
                     />
                   </td>
                 </tr>
+
+                {/* 생년월일 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     생년월일
                   </th>
-                  <td className="px-6 py-4">
+
+                  <td colSpan={3} className="px-6 py-4">
                     <input
-                      className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-64 px-3 bg-gray-100 rounded"
                       type="date"
                       value={playerInfo.birthDate || ''}
                       onChange={e =>
@@ -250,12 +266,16 @@ const AdminPlayerEdit = props => {
                     />
                   </td>
                 </tr>
+
+                {/* 팀 + 분류 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200 w-1/4">
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     소속팀
                   </th>
-                  <td className="px-6 py-4 w-1/4">
+
+                  <td className="px-6 py-4">
                     <Select
+                      className="w-64"
                       options={teamOptions}
                       value={
                         teamOptions.find(
@@ -271,64 +291,26 @@ const AdminPlayerEdit = props => {
                       }
                       placeholder="팀명을 검색하세요"
                       isClearable
-                      className="w-64"
-                      menuPortalTarget={
-                        typeof window !== 'undefined' ? document.body : null
-                      }
+                      menuPortalTarget={document.body}
                       menuPosition="fixed"
                       styles={{
-                        control: (base, state) => ({
-                          ...base,
-                          backgroundColor: '#f3f4f6', // Tailwind bg-gray-100
-                          borderColor: state.isFocused ? '#a3a3a3' : '#e5e7eb', // Tailwind border-gray-200
-                          boxShadow: state.isFocused
-                            ? '0 0 0 1px #a3a3a3'
-                            : 'none',
-                          minHeight: '40px',
-                          borderRadius: '0.375rem', // Tailwind rounded
-                          '&:hover': {
-                            borderColor: '#a3a3a3',
-                          },
-                        }),
-                        option: (base, state) => ({
-                          ...base,
-                          backgroundColor: state.isSelected
-                            ? '#e5e7eb' // Tailwind bg-gray-200
-                            : state.isFocused
-                              ? '#f3f4f6' // Tailwind bg-gray-100
-                              : '#fff',
-                          color: '#111827', // Tailwind text-gray-900
-                          fontWeight: state.isSelected ? 600 : 400,
-                          fontSize: '0.875rem', // Tailwind text-sm
-                        }),
-                        menu: base => ({
-                          ...base,
-                          zIndex: 9999,
-                        }),
-                        singleValue: base => ({
-                          ...base,
-                          color: '#111827', // Tailwind text-gray-900
-                        }),
-                        placeholder: base => ({
-                          ...base,
-                          color: '#6b7280', // Tailwind text-gray-500
-                          fontSize: '0.875rem', // Tailwind text-sm
-                        }),
+                        menuPortal: base => ({ ...base, zIndex: 9999 }),
                       }}
                     />
                   </td>
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200 w-1/4">
+
+                  <th className="w-40 px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500">
                     분류
                   </th>
-                  <td className="px-6 py-4 w-1/4">
+
+                  <td className="px-6 py-4">
                     <select
-                      className="h-10 w-32 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-40 pl-2 bg-gray-100 rounded"
                       value={playerInfo.typeGbn || ''}
                       onChange={e =>
                         setPlayerInfo(prev => ({
                           ...prev,
                           typeGbn: e.target.value,
-                          // typeGbn 변경시 관련 필드 초기화
                           position: '',
                           grade: '',
                           uniformNum: '',
@@ -346,134 +328,163 @@ const AdminPlayerEdit = props => {
                     </select>
                   </td>
                 </tr>
+
                 {/* 선수일 때만 렌더링 */}
                 {playerInfo.typeGbn === '1' && (
                   <>
                     <tr className="border-b border-gray-200">
-                      <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
-                        포지션
+                      <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
+                        선수정보
                       </th>
-                      <td className="px-6 py-4">
-                        <select
-                          className="h-10 w-32 pl-2 bg-gray-100 rounded"
-                          value={playerInfo.position || ''}
-                          onChange={e =>
-                            setPlayerInfo(prev => ({
-                              ...prev,
-                              position: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="">선택</option>
-                          <option value="FW">FW</option>
-                          <option value="MF">MF</option>
-                          <option value="DF">DF</option>
-                          <option value="GK">GK</option>
-                        </select>
-                      </td>
-                      <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
-                        학년
-                      </th>
-                      <td className="px-6 py-4">
-                        <select
-                          className="h-10 w-24 pl-2 bg-gray-100 rounded"
-                          value={playerInfo.grade || ''}
-                          onChange={e =>
-                            setPlayerInfo(prev => ({
-                              ...prev,
-                              grade: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="">선택</option>
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                          <option value="4">4</option>
-                        </select>
-                      </td>
-                      <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
-                        배번
-                      </th>
-                      <td className="px-6 py-4">
-                        <input
-                          className="h-10 w-20 pl-2 bg-gray-100 rounded"
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={playerInfo.uniformNum || ''}
-                          onChange={e => {
-                            const value = e.target.value;
-                            // 음수 입력 방지
-                            if (value === '' || Number(value) >= 0) {
+
+                      <td
+                        colSpan={3}
+                        className="px-6 py-4 flex gap-10 items-center"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-500 text-sm w-10">
+                            포지션
+                          </span>
+                          <select
+                            className="h-10 w-32 px-2 bg-gray-100 rounded"
+                            value={playerInfo.position || ''}
+                            onChange={e =>
                               setPlayerInfo(prev => ({
                                 ...prev,
-                                uniformNum: value,
-                              }));
+                                position: e.target.value,
+                              }))
                             }
-                          }}
-                        />
+                          >
+                            <option value="">선택</option>
+                            <option value="FW">FW</option>
+                            <option value="MF">MF</option>
+                            <option value="DF">DF</option>
+                            <option value="GK">GK</option>
+                          </select>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-500 text-sm w-8">
+                            학년
+                          </span>
+
+                          <select
+                            className="h-10 w-24 px-2 bg-gray-100 rounded"
+                            value={playerInfo.grade || ''}
+                            onChange={e =>
+                              setPlayerInfo(prev => ({
+                                ...prev,
+                                grade: e.target.value,
+                              }))
+                            }
+                          >
+                            <option value="">선택</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                          </select>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-500 text-sm w-8">
+                            배번
+                          </span>
+
+                          <input
+                            className="h-10 w-24 px-2 bg-gray-100 rounded"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={playerInfo.uniformNum || ''}
+                            onChange={e => {
+                              const value = e.target.value;
+                              // 음수 입력 방지
+                              if (value === '' || Number(value) >= 0) {
+                                setPlayerInfo(prev => ({
+                                  ...prev,
+                                  uniformNum: value,
+                                }));
+                              }
+                            }}
+                          />
+                        </div>
                       </td>
                     </tr>
+
                     <tr className="border-b border-gray-200">
-                      <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
-                        신장(cm)
+                      <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
+                        신체정보
                       </th>
-                      <td className="px-6 py-4">
-                        <input
-                          className="h-10 w-24 pl-2 bg-gray-100 rounded"
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={playerInfo.height || ''}
-                          onChange={e => {
-                            const value = e.target.value;
-                            // 음수 입력 방지
-                            if (value === '' || Number(value) >= 0) {
-                              setPlayerInfo(prev => ({
-                                ...prev,
-                                height: value,
-                              }));
-                            }
-                          }}
-                          placeholder="예) 180"
-                        />
-                      </td>
-                      <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
-                        체중(kg)
-                      </th>
-                      <td className="px-6 py-4">
-                        <input
-                          className="h-10 w-24 pl-2 bg-gray-100 rounded"
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={playerInfo.weight || ''}
-                          onChange={e => {
-                            const value = e.target.value;
-                            // 음수 입력 방지
-                            if (value === '' || Number(value) >= 0) {
-                              setPlayerInfo(prev => ({
-                                ...prev,
-                                weight: value,
-                              }));
-                            }
-                          }}
-                          placeholder="예) 75"
-                        />
+
+                      <td
+                        colSpan={3}
+                        className="px-6 py-4 flex items-center gap-8"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500 w-8">
+                            신장
+                          </span>
+                          <input
+                            className="h-10 w-24 px-2 bg-gray-100 rounded"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={playerInfo.height || ''}
+                            onChange={e => {
+                              const value = e.target.value;
+                              // 음수 입력 방지
+                              if (value === '' || Number(value) >= 0) {
+                                setPlayerInfo(prev => ({
+                                  ...prev,
+                                  height: value,
+                                }));
+                              }
+                            }}
+                            placeholder="예) 180"
+                          />
+                          <span className="text-sm text-gray-500">cm</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500 w-8">
+                            체중
+                          </span>
+                          <input
+                            className="h-10 w-24 px-2 bg-gray-100 rounded"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={playerInfo.weight || ''}
+                            onChange={e => {
+                              const value = e.target.value;
+                              // 음수 입력 방지
+                              if (value === '' || Number(value) >= 0) {
+                                setPlayerInfo(prev => ({
+                                  ...prev,
+                                  weight: value,
+                                }));
+                              }
+                            }}
+                            placeholder="예) 75"
+                          />
+                          <span className="text-sm text-gray-500">kg</span>
+                        </div>
                       </td>
                     </tr>
                   </>
                 )}
+
                 {/* 코칭스태프/임원일 때만 렌더링 */}
                 {(playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') && (
                   <tr className="border-b border-gray-200">
-                    <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+                    <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                       직책
                     </th>
-                    <td className="px-6 py-4">
+
+                    <td colSpan={3} className="px-6 py-4">
                       <input
-                        className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                        className="h-10 w-80 px-3 bg-gray-100 rounded"
                         type="text"
                         value={playerInfo.title || ''}
                         onChange={e =>
@@ -487,51 +498,44 @@ const AdminPlayerEdit = props => {
                     </td>
                   </tr>
                 )}
-                <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+
+                {/* 사진 */}
+                <tr>
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     사진 첨부
                   </th>
-                  <td className="px-6 py-4">
-                    <label className="inline-block cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
+
+                  <td colSpan={3} className="px-6 py-4">
+                    <label className="cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
                       파일 선택
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
-                        style={{ display: 'none' }}
+                        className="hidden"
                       />
                     </label>
-                    {playerInfo.file && playerInfo.file.length > 0 ? (
-                      <span className="ml-3 text-sm text-gray-600">
-                        {playerInfo.file[0].name}
-                      </span>
-                    ) : playerInfo.originalFileName ? (
-                      <span className="ml-3 text-xs text-gray-500">
-                        현재 등록된 이미지가 있습니다.
-                      </span>
-                    ) : (
-                      <span className="ml-3 text-sm text-gray-400">
-                        선택된 파일 없음
-                      </span>
-                    )}
-                    {playerInfo.file && playerInfo.file.length > 0 ? (
-                      <div className="mt-2">
+
+                    {playerInfo.file?.length > 0 ? (
+                      <div className="mt-3">
                         <img
-                          src=""
-                          alt="선택된 이미지"
-                          className="w-32 h-32 object-cover rounded border mb-1"
+                          src={preview}
+                          alt="preview"
+                          className="w-32 h-32 object-cover rounded border"
                         />
-                        <p className="text-sm text-gray-600">
-                          선택된 파일: {playerInfo.file[0].name}
+
+                        <p className="text-sm text-gray-600 mt-1">
+                          {playerInfo.file[0].name}
                         </p>
                       </div>
-                    ) : playerInfo.originalFileName ? (
-                      <div className="mt-2">
+                    ) : playerInfo.storedFileName ? (
+                      <div className="mt-3">
                         <img
                           src={playerInfo.storedFileName}
                           alt={playerInfo.originalFileName}
-                          className="w-32 h-32 object-cover rounded border mb-1"
+                          className="w-32 h-32 object-cover rounded border"
                         />
+
                         <p className="text-xs text-gray-500">
                           현재 등록된 이미지
                         </p>
@@ -542,13 +546,16 @@ const AdminPlayerEdit = props => {
               </tbody>
             </table>
           </div>
-          <div className="flex justify-end items-end mt-6 gap-5">
+
+          {/* 버튼 */}
+          <div className="flex justify-end mt-6 gap-4">
             <Button
               className="bg-gray-100 text-black px-10 py-2 rounded"
               onClick={handleOnCancel}
             >
               취소
             </Button>
+
             <Button
               className="bg-black text-white px-10 py-2 rounded"
               onClick={handleOnUpdate}

@@ -15,6 +15,7 @@ import AdminLeagueDetail from '../pages/admin/league/AdminLeagueDetail';
 import AdminLeagueEdit from '../pages/admin/league/AdminLeagueEdit';
 import AdminLeague from '../pages/admin/league/AdminLeague';
 import { useParams } from 'react-router-dom';
+import AdminMatch from '../pages/admin/match/AdminMatch';
 
 function AdminTeamEditWithParams(props) {
   const { teamId } = useParams();
@@ -83,6 +84,7 @@ const RootRoutes = () => {
             path={URL.ADMIN_LEAGUE_MODIFY}
             element={<AdminLeagueEdit mode={CODE.MODE_MODIFY} />}
           />
+          <Route path={URL.ADMIN_MATCH} element={<AdminMatch />} />
         </Routes>
       </div>
     </>

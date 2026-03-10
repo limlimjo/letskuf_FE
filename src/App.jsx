@@ -4,8 +4,8 @@ import React from 'react';
 function App() {
   return (
     <>
-      <body className="bg-gray-100">
-        <div className="flex h-screen">
+      <body className="min-w-[80rem] bg-gray-100">
+        <div className="flex min-h-screen">
           <React.StrictMode>
             <RootRoutes />
           </React.StrictMode>

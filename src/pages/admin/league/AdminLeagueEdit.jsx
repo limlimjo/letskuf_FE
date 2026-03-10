@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CODE from '../../../constants/code';
 import Button from '../../../components/Button';
 import { useNavigate } from 'react-router-dom';
@@ -80,14 +80,16 @@ const AdminLeagueEdit = props => {
   }, []);
 
   return (
-    <main className="flex-1 bg-gray-200">
-      <div className="container mx-auto px-10 py-8">
+    <main className="bg-gray-200 min-h-screen">
+      <div className="w-[1140px] px-10 py-8">
         <h3 className="text-gray-700 text-3xl font-bold">
           리그/대회 {modeInfo.mode === CODE.MODE_CREATE ? '등록' : '수정'}
         </h3>
-        <div className="mt-8 flex gap-4">
+
+        {/* 탭 */}
+        <div className="mt-8 flex gap-4 w-[400px]">
           <Button
-            className={`flex-1 py-2 ${
+            className={`flex-1 py-2 rounded ${
               tabType === 'LEAGUE'
                 ? 'bg-black text-white font-bold'
                 : 'bg-gray-100 text-black'
@@ -99,8 +101,9 @@ const AdminLeagueEdit = props => {
           >
             리그
           </Button>
+
           <Button
-            className={`flex-1 py-2 ${
+            className={`flex-1 py-2 rounded ${
               tabType === 'TOURNAMENT'
                 ? 'bg-black text-white font-bold'
                 : 'bg-gray-100 text-black'
@@ -113,19 +116,22 @@ const AdminLeagueEdit = props => {
             대회
           </Button>
         </div>
+
+        {/* 테이블 */}
         <div className="mt-8">
-          <div className="shadow rounded-lg overflow-hidden border-b border-gray-200">
+          <div className="shadow rounded-lg border border-gray-200 overflow-hidden">
             <table className="w-full bg-white">
               <tbody className="text-gray-900 text-sm font-medium">
+                {/* 리그명 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+                  <th className="w-60 px-6 py-3 bg-gray-100 text-sm text-center text-gray-500">
                     {tabType === 'LEAGUE' ? '리그명' : '대회명'}
                   </th>
+
                   <td className="px-6 py-4">
                     <input
-                      className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-130 pl-2 bg-gray-100 rounded"
                       type="text"
-                      required
                       value={leagueInfo.name || ''}
                       onChange={e =>
                         setLeagueInfo(prev => ({
@@ -136,13 +142,16 @@ const AdminLeagueEdit = props => {
                     />
                   </td>
                 </tr>
+
+                {/* 지역 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200 w-1/4">
+                  <th className="w-60 px-6 py-3 bg-gray-100 text-sm text-center text-gray-500">
                     지역
                   </th>
-                  <td className="px-6 py-4 w-1/4">
+
+                  <td className="px-6 py-4">
                     <select
-                      className="h-10 w-32 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-40 pl-2 bg-gray-100 rounded"
                       value={leagueInfo.region || ''}
                       onChange={e =>
                         setLeagueInfo(prev => ({
@@ -154,26 +163,27 @@ const AdminLeagueEdit = props => {
                       <option value="">선택</option>
                       <option value="전국">전국</option>
                       <option value="서울">서울</option>
-                      <option value="인천">인천 </option>
+                      <option value="인천">인천</option>
                       <option value="경기">경기</option>
                       <option value="강원">강원</option>
                       <option value="경북">경북</option>
                       <option value="경남">경남</option>
                       <option value="전북">전북</option>
                       <option value="전남">전남</option>
-                      <option value="경북">경북</option>
-                      <option value="경남">경남</option>
                       <option value="제주">제주</option>
                     </select>
                   </td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+
+                {/* 기간 */}
+                <tr>
+                  <th className="w-60 px-6 py-3 bg-gray-100 text-sm text-center text-gray-500">
                     기간
                   </th>
-                  <td className="px-6 py-4 flex gap-4 items-center">
+
+                  <td className="px-6 py-4 flex items-center gap-3">
                     <input
-                      className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-56 px-3 bg-gray-100 rounded"
                       type="date"
                       value={leagueInfo.startDate || ''}
                       onChange={e =>
@@ -182,10 +192,12 @@ const AdminLeagueEdit = props => {
                           startDate: e.target.value,
                         }))
                       }
-                    />{' '}
-                    부터
+                    />
+
+                    <span>부터</span>
+
                     <input
-                      className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-56 px-3 bg-gray-100 rounded"
                       type="date"
                       value={leagueInfo.endDate || ''}
                       onChange={e =>
@@ -194,20 +206,24 @@ const AdminLeagueEdit = props => {
                           endDate: e.target.value,
                         }))
                       }
-                    />{' '}
-                    까지
+                    />
+
+                    <span>까지</span>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div className="flex justify-end items-end mt-6 gap-5">
+
+          {/* 버튼 */}
+          <div className="flex justify-end mt-6 gap-4">
             <Button
               className="bg-gray-100 text-black px-10 py-2 rounded"
               onClick={handleOnCancel}
             >
               취소
             </Button>
+
             <Button
               className="bg-black text-white px-10 py-2 rounded"
               onClick={handleOnUpdate}

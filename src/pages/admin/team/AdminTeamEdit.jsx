@@ -7,10 +7,9 @@ import * as ApiFetch from '../../../api/apiFetch';
 import formValidatorTeam from '../../../utils/formValidatorTeam';
 
 const AdminTeamEdit = props => {
-  console.log('props 확인 : ', props);
-
   const [modeInfo, setModeInfo] = useState({ mode: props.mode });
   const [teamInfo, setTeamInfo] = useState({ teamFile: [] });
+  const [preview, setPreview] = useState(null);
   const detailAddressRef = useRef(null);
   const navigate = useNavigate();
 
@@ -79,6 +78,10 @@ const AdminTeamEdit = props => {
       ...prev,
       teamFile: file ? [file] : [],
     }));
+
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
   // 취소 버튼 클릭
@@ -171,24 +174,26 @@ const AdminTeamEdit = props => {
   }, []);
 
   return (
-    <main className="flex-1 bg-gray-200">
-      <div className="container mx-auto px-10 py-8">
+    <main className="flex-1 bg-gray-200 min-h-screen">
+      <div className="max-w-[1140px] px-10 py-8">
         <h3 className="text-gray-700 text-3xl font-bold">
           팀 {modeInfo.mode === CODE.MODE_CREATE ? '등록' : '수정'}
         </h3>
+
         <div className="mt-8">
-          <div className="shadow rounded-lg overflow-hidden border-b border-gray-200">
-            <table className="w-full bg-white">
+          <div className="shadow rounded-lg overflow-hidden border border-gray-200">
+            <table className="w-full table-fixed bg-white">
               <tbody className="text-gray-900 text-sm font-medium">
+                {/* 팀명 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     팀명
                   </th>
+
                   <td className="px-6 py-4">
                     <input
-                      className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-64 px-3 bg-gray-100 rounded"
                       type="text"
-                      required
                       value={teamInfo.teamNm || ''}
                       onChange={e =>
                         setTeamInfo(prev => ({
@@ -199,17 +204,19 @@ const AdminTeamEdit = props => {
                     />
                   </td>
                 </tr>
+
+                {/* 창단년도 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     창단년도
                   </th>
+
                   <td className="px-6 py-4">
                     <input
-                      className="h-10 w-64 pl-2 bg-gray-100 rounded"
+                      className="h-10 w-64 px-3 bg-gray-100 rounded"
                       type="number"
-                      required
                       min="1800"
-                      max={new Date().getFullYear}
+                      max={new Date().getFullYear()}
                       value={teamInfo.foundYear || ''}
                       onChange={e =>
                         setTeamInfo(prev => ({
@@ -220,118 +227,91 @@ const AdminTeamEdit = props => {
                     />
                   </td>
                 </tr>
+
+                {/* 주소 */}
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     주소
                   </th>
+
                   <td className="px-6 py-4">
                     <div className="flex gap-4">
                       <div className="flex flex-col">
                         <input
-                          className="h-10 w-64 pl-2 mb-3 bg-gray-100 rounded"
-                          type="text"
+                          className="h-10 w-64 mb-3 px-3 bg-gray-100 rounded"
                           value={teamInfo.postcode || ''}
-                          onChange={e =>
-                            setTeamInfo(prev => ({
-                              ...prev,
-                              postcode: e.target.value,
-                            }))
-                          }
-                          id="postcode"
-                          name="postcode"
+                          readOnly
                           placeholder="우편번호"
-                          readOnly="readonly"
                         />
+
                         <input
-                          className="h-10 w-64 pl-2 mb-3 bg-gray-100 rounded"
-                          type="text"
+                          className="h-10 w-64 mb-3 px-3 bg-gray-100 rounded"
                           value={teamInfo.address || ''}
-                          onChange={e =>
-                            setTeamInfo(prev => ({
-                              ...prev,
-                              address: e.target.value,
-                            }))
-                          }
-                          id="address"
-                          name="address"
+                          readOnly
                           placeholder="주소"
-                          readOnly="readonly"
                         />
+
                         <input
-                          className="h-10 w-64 pl-2 bg-gray-100 rounded"
-                          type="text"
+                          className="h-10 w-64 px-3 bg-gray-100 rounded"
                           ref={detailAddressRef}
                           value={teamInfo.detailAddress || ''}
+                          placeholder="상세주소"
                           onChange={e =>
                             setTeamInfo(prev => ({
                               ...prev,
                               detailAddress: e.target.value,
                             }))
                           }
-                          id="detailAddress"
-                          name="detailAddress"
-                          placeholder="상세주소"
-                        />
-                        <input
-                          type="hidden"
-                          value={teamInfo.regionNm || ''}
-                          name="regionNm"
                         />
                       </div>
-                      <input
-                        className="h-10 w-30 pl-2 bg-black text-white rounded"
-                        type="button"
+
+                      <Button
+                        className="h-10 px-6 bg-black text-white rounded"
                         onClick={handleOpenDaumPostCode}
-                        value="주소 검색"
-                      />
+                      >
+                        주소 검색
+                      </Button>
                     </div>
                   </td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 font-bold bg-gray-100 text-sm text-center text-gray-500 border-b border-gray-200">
+
+                {/* 이미지 */}
+                <tr>
+                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
                     사진 첨부
                   </th>
+
                   <td className="px-6 py-4">
-                    <label className="inline-block cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
+                    <label className="cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
                       파일 선택
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
-                        style={{ display: 'none' }}
+                        className="hidden"
                       />
                     </label>
-                    {teamInfo.teamFile && teamInfo.teamFile.length > 0 ? (
-                      <span className="ml-3 text-sm text-gray-600">
-                        {teamInfo.teamFile[0].name}
-                      </span>
-                    ) : teamInfo.originalFileName ? (
-                      <span className="ml-3 text-xs text-gray-500">
-                        현재 등록된 이미지가 있습니다.
-                      </span>
-                    ) : (
-                      <span className="ml-3 text-sm text-gray-400">
-                        선택된 파일 없음
-                      </span>
-                    )}
-                    {teamInfo.teamFile && teamInfo.teamFile.length > 0 ? (
-                      <div className="mt-2">
+
+                    {teamInfo.teamFile?.length > 0 ? (
+                      <div className="mt-3">
                         <img
-                          src=""
-                          alt="선택된 이미지"
-                          className="w-32 h-32 object-cover rounded border mb-1"
+                          src={preview}
+                          alt="preview"
+                          className="w-32 h-32 object-cover rounded border"
                         />
-                        <p className="text-sm text-gray-600">
-                          선택된 파일: {teamInfo.teamFile[0].name}
+
+                        <p className="text-sm text-gray-600 mt-1">
+                          {teamInfo.teamFile[0].name}
                         </p>
                       </div>
-                    ) : teamInfo.originalFileName ? (
-                      <div className="mt-2">
+                    ) : teamInfo.storedFileName ? (
+                      <div className="mt-3">
                         <img
                           src={teamInfo.storedFileName}
                           alt={teamInfo.originalFileName}
-                          className="w-32 h-32 object-cover rounded border mb-1"
+                          className="w-32 h-32 object-cover rounded border"
                         />
+
                         <p className="text-xs text-gray-500">
                           현재 등록된 이미지
                         </p>
@@ -342,15 +322,18 @@ const AdminTeamEdit = props => {
               </tbody>
             </table>
           </div>
-          <div className="flex justify-end items-end mt-6 gap-5">
+
+          {/* 버튼 */}
+          <div className="flex justify-end mt-6 gap-4">
             <Button
-              className="bg-gray-100 text-black px-10 py-2 rounded"
+              className="bg-gray-100 text-black px-8 py-2 rounded"
               onClick={handleOnCancel}
             >
               취소
             </Button>
+
             <Button
-              className="bg-black text-white px-10 py-2 rounded"
+              className="bg-black text-white px-8 py-2 rounded"
               onClick={handleOnUpdate}
             >
               {modeInfo.mode === CODE.MODE_CREATE ? '등록' : '수정'}

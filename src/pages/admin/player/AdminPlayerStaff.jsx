@@ -18,10 +18,9 @@ const AdminPlayerStaff = () => {
 
   const retrieveList = useCallback(
     srchCond => {
-      console.log('useCallback 시작');
-
       const retrieveListURL =
         '/api/retrieveCoach.do' + ApiFetch.getQueryString(srchCond);
+
       const requestOptions = {
         method: 'GET',
         headers: {
@@ -30,37 +29,37 @@ const AdminPlayerStaff = () => {
       };
 
       ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
-        console.log('api 호출결과');
-        console.log(resp);
         setPaginationInfo(resp.result.paginationInfo);
+
         let mutListTag = [];
 
-        const resultCnt = parseInt(resp.result.resultCnt);
-        const currentPageNo = resp.result.paginationInfo.currentPageNo;
-        const pageSize = resp.result.paginationInfo.pageSize;
-
-        // 리스트 항목
-        resp.result.resultList.forEach(function (item, index) {
-          if (index === 0) mutListTag = [];
-          //const listIdx = itemIdxByPage(resultCnt, currentPageNo, pageSize, index);
-
+        resp.result.resultList.forEach(item => {
           mutListTag.push(
-            <tr className="border-b border-gray-200">
-              <td className="px-6 py-4">{item.coachId}</td>
-              <td className="px-6 py-4">{item.name}</td>
-              <td className="px-6 py-4">{item.teamNm}</td>
-              <td className="px-6 py-4">{item.birthDate}</td>
-              <td className="px-6 py-4">{item.title}</td>
-              <td className="px-6 py-4" colSpan={2}>
+            <tr
+              key={item.coachId}
+              className="border-b border-gray-200 hover:bg-gray-50"
+            >
+              <td className="px-6 py-3">{item.coachId}</td>
+
+              <td className="px-6 py-3">{item.name}</td>
+
+              <td className="px-6 py-3">{item.teamNm}</td>
+
+              <td className="px-6 py-3">{item.birthDate}</td>
+
+              <td className="px-6 py-3">{item.title}</td>
+
+              <td className="px-6 py-3">
                 <Link
                   to={`/admin/player/staff/${item.coachId}/modify`}
-                  className="bg-green-100 text-green-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-green-200 transition mr-2"
+                  className="bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 mr-2"
                 >
                   수정
                 </Link>
+
                 <button
                   onClick={() => handleOnDelete(item.coachId)}
-                  className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-red-200 transition"
+                  className="bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200"
                 >
                   삭제
                 </button>
@@ -71,37 +70,39 @@ const AdminPlayerStaff = () => {
 
         if (!mutListTag.length) {
           mutListTag.push(
-            <tr className="border-b border-gray-200">
-              <td colSpan={6} className="py-8 text-center text-gray-500">
+            <tr key="empty">
+              <td colSpan={6} className="py-10 text-center text-gray-500">
                 검색결과가 없습니다.
               </td>
             </tr>,
           );
         }
+
         setListTag(mutListTag);
       });
     },
-    [listTag, searchCondition],
+    [searchCondition],
   );
 
-  // 삭제 버튼 클릭 핸들러
   const handleOnDelete = useCallback(
     coachId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
+
       const deleteUrl = `/api/deleteCoach.do?coachId=${coachId}`;
+
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
         },
       };
+
       ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
-        console.log('삭제 결과:', resp);
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('삭제되었습니다.');
-          retrieveList(searchCondition); // 삭제 후 리스트 갱신
+          retrieveList(searchCondition);
         } else {
-          alert('삭제에 실패했습니다. 다시 시도해주세요.');
+          alert('삭제에 실패했습니다.');
         }
       });
     },
@@ -113,41 +114,48 @@ const AdminPlayerStaff = () => {
   }, []);
 
   return (
-    <main className="flex-1 bg-gray-200">
-      <div className="container mx-auto px-10 py-8">
+    <main className="flex-1 bg-gray-200 min-h-screen">
+      <div className="max-w-[1140px] px-10 py-8">
         <h3 className="text-gray-700 text-3xl font-bold">
           선수단 목록 (코칭스태프/임원)
         </h3>
+
+        {/* 검색 */}
         <div className="relative mt-6">
-          <span className="absolute left-0 inset-y-0 pl-3 flex items-center">
-            <i className="fas fa-search" />
-          </span>
           <input
-            className="focus:border-indigo-600 h-10 w-64 pl-10 pr-4 rounded-md bg-gray-50"
+            className="h-10 w-64 px-4 rounded-md bg-white border border-gray-300 focus:outline-none focus:border-indigo-500"
             type="text"
+            placeholder="코칭스태프/임원 검색"
           />
         </div>
+
+        {/* 리스트 */}
         <div className="mt-8">
-          <div className="shadow rounded-lg overflow-hidden border-b border-gray-200">
-            <table className="w-full">
+          <div className="shadow rounded-lg overflow-hidden border border-gray-200">
+            <table className="w-full bg-white">
               <thead>
-                <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
-                  <th className="px-6 py-3 font-medium">No.</th>
+                <tr className="bg-gray-100 text-xs text-gray-500 text-center">
+                  <th className="px-6 py-3 font-medium">No</th>
+
                   <th className="px-6 py-3 font-medium">이름</th>
+
                   <th className="px-6 py-3 font-medium">소속</th>
+
                   <th className="px-6 py-3 font-medium">생년월일</th>
+
                   <th className="px-6 py-3 font-medium">직책</th>
-                  <th className="px-6 py-3 font-medium" colSpan={2}>
-                    관리
-                  </th>
+
+                  <th className="px-6 py-3 font-medium">관리</th>
                 </tr>
               </thead>
-              <tbody className="bg-white text-gray-900 text-sm text-center font-medium">
+
+              <tbody className="text-sm text-gray-900 text-center font-medium">
                 {listTag}
               </tbody>
             </table>
           </div>
         </div>
+
         <Pagination
           pagination={paginationInfo}
           moveToPage={passedPage => {

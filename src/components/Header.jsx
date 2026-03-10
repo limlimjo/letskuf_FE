@@ -1,11 +1,7 @@
 const Header = () => {
   return (
     <header className="flex justify-between items-center px-6 py-2 h-16 bg-white border-b-4 border-gray-800">
-      <div className="flex items-center">
-        <button id="sidebarToggle" className="text-gray-500 lg:hidden p-2 mr-4">
-          <i className="fas fa-bars" />
-        </button>
-      </div>
+      <div className="flex items-center" />
       <div className="flex items-center gap-x-4">
         <button className="w-8 h-8 rounded-full overflow-hidden">
           <img

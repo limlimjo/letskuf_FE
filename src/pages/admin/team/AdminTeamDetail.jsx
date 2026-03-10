@@ -41,11 +41,11 @@ const AdminTeamDetail = () => {
   const staffs = coachInfo.filter(item => item.typeGbn === '3');
 
   return (
-    <main className="flex-1 bg-gray-200">
-      <div className="container mx-auto px-10 py-8">
+    <main className="flex-1 bg-gray-200 min-h-screen">
+      <div className="max-w-[1140px] px-10 py-8">
         <div className="flex items-center gap-x-3">
           <span className="w-10 h-10 rounded-full overflow-hidden border-1">
-            {/* <img src="" alt="univ" /> */}
+            <img src={teamInfo.storedFilePath} alt="univ" />
           </span>
           <h3 className="text-gray-700 text-3xl font-bold">
             {teamInfo.teamNm}
@@ -57,7 +57,7 @@ const AdminTeamDetail = () => {
             <div>
               <h2 className="text-gray-700 text-2xl font-bold">지도자</h2>
               <div className="mt-4 shadow rounded-lg overflow-hidden border-b border-gray-200">
-                <table className="w-full">
+                <table className="w-[1280px]">
                   <thead>
                     <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                       <th className="px-4 py-3 font-medium">이름</th>
@@ -84,7 +84,7 @@ const AdminTeamDetail = () => {
             <div className="mt-10">
               <h2 className="text-gray-700 text-2xl font-bold">임원</h2>
               <div className="mt-4 shadow rounded-lg overflow-hidden border-b border-gray-200">
-                <table className="w-full">
+                <table className="w-[1280px]">
                   <thead>
                     <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                       <th className="px-6 py-3 font-medium">이름</th>
@@ -112,7 +112,7 @@ const AdminTeamDetail = () => {
           <div className="w-3/5">
             <h2 className="text-gray-700 text-2xl font-bold">선수</h2>
             <div className="mt-4 shadow rounded-lg overflow-hidden border-b border-gray-200">
-              <table className="w-full">
+              <table className="w-[1280px]">
                 <thead>
                   <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                     <th className="px-6 py-3 font-medium">배번</th>

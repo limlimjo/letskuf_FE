@@ -20,12 +20,11 @@ const AdminLeague = () => {
 
   const retrieveList = useCallback(
     srchCond => {
-      console.log('useCallback 시작');
-
       const params = { ...srchCond, type: tabType };
 
       const retrieveListURL =
         '/api/retrieveLeague.do' + ApiFetch.getQueryString(params);
+
       const requestOptions = {
         method: 'GET',
         headers: {
@@ -34,37 +33,35 @@ const AdminLeague = () => {
       };
 
       ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
-        console.log('api 호출결과');
-        console.log(resp);
         setPaginationInfo(resp.result.paginationInfo);
+
         let mutListTag = [];
 
-        const resultCnt = parseInt(resp.result.resultCnt);
-        const currentPageNo = resp.result.paginationInfo.currentPageNo;
-        const pageSize = resp.result.paginationInfo.pageSize;
-
-        // 리스트 항목
         resp.result.resultList.forEach(function (item, index) {
-          if (index === 0) mutListTag = [];
-          //const listIdx = itemIdxByPage(resultCnt, currentPageNo, pageSize, index);
-
           mutListTag.push(
-            <tr className="border-b border-gray-200">
-              <td className="px-6 py-4">{item.no}</td>
-              <td className="px-6 py-4">{item.name}</td>
-              <td className="px-6 py-4">{item.region}</td>
-              <td className="px-6 py-4">
+            <tr key={item.leagueId} className="border-b border-gray-200">
+              <td className="px-6 py-3 w-16">{item.no}</td>
+
+              <td className="px-6 py-3 font-medium max-w-[200px] truncate">
+                {item.name}
+              </td>
+
+              <td className="px-6 py-3 whitespace-nowrap">{item.region}</td>
+
+              <td className="px-6 py-3 whitespace-nowrap min-w-[180px]">
                 {item.startDate} ~ {item.endDate}
               </td>
-              <td className="px-6 py-4" colSpan={2}>
+
+              <td className="px-6 py-3 whitespace-nowrap" colSpan={2}>
                 <Link
                   to={`/admin/league/${item.leagueId}`}
-                  className="bg-green-100 text-green-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-green-200 transition mr-2"
+                  className="bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 transition mr-2"
                 >
                   수정
                 </Link>
+
                 <button
-                  className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded-full font-semibold hover:bg-red-200 transition"
+                  className="bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200 transition"
                   onClick={() => handleOnDelete(item.leagueId)}
                 >
                   삭제
@@ -76,37 +73,39 @@ const AdminLeague = () => {
 
         if (!mutListTag.length) {
           mutListTag.push(
-            <tr className="border-b border-gray-200">
-              <td colSpan={6} className="py-8 text-center text-gray-500">
+            <tr key="empty">
+              <td colSpan={6} className="py-10 text-center text-gray-500">
                 검색결과가 없습니다.
               </td>
             </tr>,
           );
         }
+
         setListTag(mutListTag);
       });
     },
-    [tabType, searchCondition],
+    [tabType],
   );
 
-  // 삭제 버튼 클릭 핸들러
   const handleOnDelete = useCallback(
     leagueId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
+
       const deleteUrl = `/api/deleteLeague.do?leagueId=${leagueId}`;
+
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
         },
       };
+
       ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
-        console.log('삭제 결과: ', resp);
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('삭제되었습니다.');
-          retrieveList(searchCondition); // 삭제 후 리스트 갱신
+          retrieveList(searchCondition);
         } else {
-          alert('삭제에 실패했습니다. 다시 시도해주세요.');
+          alert('삭제 실패');
         }
       });
     },
@@ -118,71 +117,83 @@ const AdminLeague = () => {
   }, [tabType]);
 
   return (
-    <main className="flex-1 bg-gray-200">
-      <div className="container mx-auto px-10 py-8">
+    <main className="flex-1 bg-gray-200 min-h-screen">
+      <div className="max-w-[1140px] px-10 py-8">
         <h3 className="text-gray-700 text-3xl font-bold">리그/대회 목록</h3>
-        <div className="mt-8 flex gap-4">
+
+        {/* 탭 */}
+        <div className="mt-8 flex gap-4 w-[400px]">
           <Button
-            className={`flex-1 py-2 ${
+            className={`flex-1 py-2 rounded ${
               tabType === 'LEAGUE'
                 ? 'bg-black text-white font-bold'
-                : 'bg-gray-100 text-black'
+                : 'bg-gray-100'
             }`}
             onClick={() => setTabType('LEAGUE')}
           >
             리그
           </Button>
+
           <Button
-            className={`flex-1 py-2 ${
+            className={`flex-1 py-2 rounded ${
               tabType === 'TOURNAMENT'
                 ? 'bg-black text-white font-bold'
-                : 'bg-gray-100 text-black'
+                : 'bg-gray-100'
             }`}
             onClick={() => setTabType('TOURNAMENT')}
           >
             대회
           </Button>
         </div>
-        <div className="relative mt-6">
-          <span className="absolute left-0 inset-y-0 pl-3 flex items-center">
-            <i className="fas fa-search" />
-          </span>
+
+        {/* 검색 */}
+        <div className="mt-6 flex items-center">
           <input
-            className="focus:border-indigo-600 h-10 w-64 pl-10 pr-4 rounded-md bg-gray-50"
+            className="h-10 w-64 px-4 rounded-md bg-gray-50 border border-gray-200 focus:border-indigo-600 outline-none"
             type="text"
+            placeholder="리그/대회명 검색"
           />
         </div>
+
+        {/* 리스트 */}
         <div className="mt-8">
-          <div className="shadow rounded-lg overflow-hidden border-b border-gray-200">
+          <div className="shadow rounded-lg overflow-hidden border border-gray-200">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
-                  <th className="px-6 py-3 font-medium">No.</th>
+                  <th className="px-6 py-3 font-medium w-20">No.</th>
+
                   <th className="px-6 py-3 font-medium">
                     {tabType === 'LEAGUE' ? '리그명' : '대회명'}
                   </th>
-                  <th className="px-6 py-3 font-medium">지역</th>
-                  <th className="px-6 py-3 font-medium">기간</th>
-                  <th className="px-6 py-3 font-medium" colSpan={2}>
-                    관리
-                  </th>
+
+                  <th className="px-6 py-3 font-medium w-32">지역</th>
+
+                  <th className="px-6 py-3 font-medium w-48">기간</th>
+
+                  <th className="px-6 py-3 font-medium w-40">관리</th>
                 </tr>
               </thead>
+
               <tbody className="bg-white text-gray-900 text-sm text-center font-medium">
                 {listTag}
               </tbody>
             </table>
           </div>
         </div>
-        <Pagination
-          pagination={paginationInfo}
-          moveToPage={passedPage => {
-            retrieveList({
-              ...searchCondition,
-              pageIndex: passedPage,
-            });
-          }}
-        />
+
+        {/* 페이지네이션 */}
+        <div className="mt-6">
+          <Pagination
+            pagination={paginationInfo}
+            moveToPage={passedPage => {
+              retrieveList({
+                ...searchCondition,
+                pageIndex: passedPage,
+              });
+            }}
+          />
+        </div>
       </div>
     </main>
   );
