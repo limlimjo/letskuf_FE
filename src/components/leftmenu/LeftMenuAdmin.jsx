@@ -67,6 +67,21 @@ const LeftMenuAdmin = () => {
           </NavLink>
         </div>
         <div className="flex flex-col">
+          <p className="text-xl font-bold py-1.5 px-4 rounded">경기장소 관리</p>
+          <NavLink
+            to={URL.ADMIN_VENUE}
+            className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
+          >
+            경기장소 목록
+          </NavLink>
+          <NavLink
+            to={URL.ADMIN_VENUE_CREATE}
+            className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
+          >
+            경기장소 등록
+          </NavLink>
+        </div>
+        <div className="flex flex-col">
           <p className="text-xl font-bold py-1.5 px-4 rounded">경기 관리</p>
           <NavLink
             to={URL.ADMIN_MATCH}

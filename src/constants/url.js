@@ -19,6 +19,12 @@ const URL = {
   ADMIN_LEAGUE_CREATE: '/admin/league/create',
   ADMIN_LEAGUE_MODIFY: '/admin/league/modify',
 
+  //ADMIN-VENUE
+  ADMIN_VENUE: '/admin/venue',
+  ADMIN_VENUE_DETAIL: '/admin/venue/:venueId',
+  ADMIN_VENUE_CREATE: '/admin/venue/create',
+  ADMIN_VENUE_MODIFY: '/admin/venue/:venueId/modify',
+
   //ADMIN-MATCH
   ADMIN_MATCH: '/admin/match',
   ADMIN_MATCH_DETAIL: '/admin/match/:matchId',

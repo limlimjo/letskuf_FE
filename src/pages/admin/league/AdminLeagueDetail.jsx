@@ -15,6 +15,9 @@ const AdminLeagueDetail = () => {
     startDate: '',
     endDate: '',
   });
+  const [keyword, setKeyword] = useState('');
+  const [searchVenueList, setSearchVenueList] = useState([]);
+  const [venueList, setVenueList] = useState([]);
 
   const retrieveList = useCallback(() => {
     const retrieveListURL =
@@ -184,67 +187,6 @@ const AdminLeagueDetail = () => {
                 {isEditing ? '저장' : '수정'}
               </Button>
             </div>
-          </div>
-        </div>
-
-        {/* 경기장 등록 및 수정 */}
-        <div className="mt-10">
-          <h2 className="text-gray-700 text-2xl font-bold">
-            경기장 등록 및 수정
-          </h2>
-
-          <div className="flex flex-col gap-4 mt-4 bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <span className="font-bold w-32">장소명</span>
-              <input
-                className="h-10 w-60 px-2 rounded bg-gray-100"
-                type="text"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <span className="font-bold w-32">주소</span>
-              <input
-                className="h-10 w-80 px-2 rounded bg-gray-100"
-                type="text"
-              />
-            </div>
-
-            <div className="flex justify-end">
-              <Button className="bg-black text-white px-8 py-2 rounded">
-                등록
-              </Button>
-            </div>
-          </div>
-
-          {/* 경기장 목록 */}
-          <div className="mt-4 shadow rounded-lg overflow-hidden border-b border-gray-200">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
-                  <th className="px-6 py-3 font-medium">No.</th>
-                  <th className="px-6 py-3 font-medium">장소명</th>
-                  <th className="px-6 py-3 font-medium">주소</th>
-                  <th className="px-6 py-3 font-medium">관리</th>
-                </tr>
-              </thead>
-              {/* TODO: 수정 필요한 부분 (가상 데이터) */}
-              <tbody className="bg-white text-gray-900 text-sm text-center font-medium">
-                <tr className="border-b border-gray-200">
-                  <td className="px-6 py-4">1</td>
-                  <td className="px-6 py-4">남산타워 운동장 제1구장</td>
-                  <td className="px-6 py-4">서울 용산구 남산공원길 105</td>
-                  <td className="px-6 py-4">
-                    <span className="bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 mr-2">
-                      수정
-                    </span>
-                    <span className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded hover:bg-red-200">
-                      삭제
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>

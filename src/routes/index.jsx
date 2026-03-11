@@ -8,7 +8,6 @@ import LeftMenuAdmin from '../components/leftmenu/LeftMenuAdmin';
 import AdminTeamDetail from '../pages/admin/team/AdminTeamDetail';
 import AdminTeamEdit from '../pages/admin/team/AdminTeamEdit';
 import AdminPlayer from '../pages/admin/player/AdminPlayer';
-import AdminPlayerDetail from '../pages/admin/player/AdminPlayerDetail';
 import AdminPlayerEdit from '../pages/admin/player/AdminPlayerEdit';
 import AdminPlayerStaff from '../pages/admin/player/AdminPlayerStaff';
 import AdminLeagueDetail from '../pages/admin/league/AdminLeagueDetail';
@@ -16,6 +15,8 @@ import AdminLeagueEdit from '../pages/admin/league/AdminLeagueEdit';
 import AdminLeague from '../pages/admin/league/AdminLeague';
 import { useParams } from 'react-router-dom';
 import AdminMatch from '../pages/admin/match/AdminMatch';
+import AdminVenue from '../pages/admin/venue/AdminVenue';
+import AdminVenueEdit from '../pages/admin/venue/AdminVenueEdit';
 
 function AdminTeamEditWithParams(props) {
   const { teamId } = useParams();
@@ -33,6 +34,13 @@ function AdminPlayerStaffEditWithParams(props) {
   const { coachId } = useParams();
   return (
     <AdminPlayerEdit mode={CODE.MODE_MODIFY} coachId={coachId} {...props} />
+  );
+}
+
+function AdminVenueEditWithParams(props) {
+  const { venueId } = useParams();
+  return (
+    <AdminVenueEdit mode={CODE.MODE_MODIFY} venueId={venueId} {...props} />
   );
 }
 
@@ -55,10 +63,6 @@ const RootRoutes = () => {
           />
           <Route path={URL.ADMIN_PLAYER} element={<AdminPlayer />} />
           <Route path={URL.ADMIN_PLAYER_STAFF} element={<AdminPlayerStaff />} />
-          <Route
-            path={URL.ADMIN_PLAYER_DETAIL}
-            element={<AdminPlayerDetail />}
-          />
           <Route
             path={URL.ADMIN_PLAYER_CREATE}
             element={<AdminPlayerEdit mode={CODE.MODE_CREATE} />}
@@ -83,6 +87,15 @@ const RootRoutes = () => {
           <Route
             path={URL.ADMIN_LEAGUE_MODIFY}
             element={<AdminLeagueEdit mode={CODE.MODE_MODIFY} />}
+          />
+          <Route path={URL.ADMIN_VENUE} element={<AdminVenue />} />
+          <Route
+            path={URL.ADMIN_VENUE_CREATE}
+            element={<AdminVenueEdit mode={CODE.MODE_CREATE} />}
+          />
+          <Route
+            path={URL.ADMIN_VENUE_MODIFY}
+            element={<AdminVenueEditWithParams />}
           />
           <Route path={URL.ADMIN_MATCH} element={<AdminMatch />} />
         </Routes>

@@ -4,12 +4,12 @@ import Button from '../../../components/Button';
 import { useNavigate } from 'react-router-dom';
 import URL from '../../../constants/url';
 import * as ApiFetch from '../../../api/apiFetch';
-import formValidatorTeam from '../../../utils/formValidatorTeam';
+import formValidatorVenue from '../../../utils/formValidatorVenue';
 
-const AdminTeamEdit = props => {
+const AdminVenueEdit = props => {
   const [modeInfo, setModeInfo] = useState({ mode: props.mode });
-  const [teamInfo, setTeamInfo] = useState({ teamFile: [] });
-  const [preview, setPreview] = useState(null);
+  const [venueInfo, setVenueInfo] = useState({});
+
   const detailAddressRef = useRef(null);
   const navigate = useNavigate();
 
@@ -19,7 +19,7 @@ const AdminTeamEdit = props => {
         setModeInfo({
           ...modeInfo,
           modeTitle: '등록',
-          editURL: '/admin/team/create',
+          editURL: '/admin/venue/create',
         });
         break;
 
@@ -27,7 +27,7 @@ const AdminTeamEdit = props => {
         setModeInfo({
           ...modeInfo,
           modeTitle: '수정',
-          editURL: `/admin/team/${props.teamId}/modify`,
+          editURL: `/admin/venue/${props.venueId}/modify`,
         });
         break;
     }
@@ -42,7 +42,6 @@ const AdminTeamEdit = props => {
           // 각 주소의 노출 규칙에 따라 주소를 조합
           // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기
           var addr = ''; // 주소 변수
-          var regionNm = data.sido; // 지역 추출 (시/도)
 
           //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져옴
           if (data.userSelectedType === 'R') {
@@ -53,11 +52,10 @@ const AdminTeamEdit = props => {
             addr = data.jibunAddress;
           }
           // 우편번호와 주소 정보 세팅
-          setTeamInfo(prev => ({
+          setVenueInfo(prev => ({
             ...prev,
             postcode: data.zonecode,
             address: addr,
-            regionNm: regionNm,
           }));
 
           // 상세주소 input 포커스
@@ -71,59 +69,27 @@ const AdminTeamEdit = props => {
     }
   };
 
-  // 파일 선택 추가
-  const handleFileChange = e => {
-    const file = e.target.files[0];
-    setTeamInfo(prev => ({
-      ...prev,
-      teamFile: file ? [file] : [],
-    }));
-
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
   // 취소 버튼 클릭
   const handleOnCancel = () => {
-    navigate({ pathname: URL.ADMIN_TEAM });
+    navigate({ pathname: URL.ADMIN_VENUE });
   };
 
   // 등록/수정 버튼 클릭
   const handleOnUpdate = async () => {
     console.log('등록 버튼');
     const formData = new FormData();
-    for (let key in teamInfo) {
-      if (key === 'teamId') continue; // teamId는 루프에서 제외
-      if (key === 'teamFile') {
-        if (teamInfo[key].length > 0) {
-          // 파일이 있을 때
-          teamInfo[key].forEach(file => {
-            formData.append('teamFile', file);
-          });
-        } else {
-          // 파일이 없을 때 빈 파일 추가
-          formData.append('teamFile', new File([], ''));
-        }
-      } else if (teamInfo[key] !== null && teamInfo[key] !== undefined) {
+    for (let key in venueInfo) {
+      if (venueInfo[key] !== null && venueInfo[key] !== undefined) {
         // 일반 필드들 처리
-        formData.append(key, teamInfo[key]);
+        formData.append(key, venueInfo[key]);
       }
     }
 
     // 유효성 검사
-    if (formValidatorTeam(formData)) {
+    if (formValidatorVenue(formData)) {
       console.log('formData 출력');
       console.log(formData);
-
-      let apiUrl = '';
-      if (modeInfo.mode === CODE.MODE_CREATE) {
-        apiUrl = '/api/registerTeam.do';
-      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
-        apiUrl = '/api/updateTeam.do';
-        console.log('props.teamId : ', props.teamId);
-        formData.append('teamId', props.teamId); // 수정 모드일 때 팀 ID 추가
-      }
+      let apiUrl = '/api/registerVenue.do';
 
       const requestOptions = {
         method: 'POST',
@@ -135,41 +101,39 @@ const AdminTeamEdit = props => {
         console.log('api 호출');
         console.log(resp);
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          navigate({ pathname: URL.ADMIN_TEAM });
+          navigate({ pathname: URL.ADMIN_VENUE });
         } else {
           console.error('error');
+          alert('경기장소 등록에 실패하였습니다.');
         }
       });
     }
   };
 
-  // 팀 정보 조회 (수정 모드일 때)
-  const fetchTeamInfo = async () => {
+  // 경기장소 정보 조회 (수정 모드일 때)
+  const fetchVenueInfo = async () => {
     try {
-      console.log('팀 정보 조회 시작');
+      console.log('경기장소 정보 조회 시작');
       ApiFetch.requestFetch(
-        `/api/retrieveUpdateTeamDetail.do?teamId=${props.teamId}`,
+        `/api/retrieveVenueDetail.do?venueId=${props.venueId}`,
         { method: 'GET' },
         resp => {
           if (resp && resp.result) {
-            setTeamInfo({
-              ...resp.result.team,
-              teamFile: [],
-              originalFileName: resp.result.teamFile?.originalFileName || '', // 파일명만 저장
-              storedFileName: resp.result.teamFile?.storedFileName || '', // 이미지 URL 저장
+            setVenueInfo({
+              ...resp.result.venue,
             });
           }
         },
       );
     } catch (e) {
-      alert('팀 정보를 불러오지 못했습니다.');
+      alert('경기장소 정보를 불러오지 못했습니다.');
     }
   };
 
   useEffect(() => {
     initMode();
-    if (props.mode === CODE.MODE_MODIFY && props.teamId) {
-      fetchTeamInfo();
+    if (props.mode === CODE.MODE_MODIFY && props.venueId) {
+      fetchVenueInfo();
     }
   }, []);
 
@@ -177,51 +141,28 @@ const AdminTeamEdit = props => {
     <main className="flex-1 bg-gray-200 min-h-screen">
       <div className="max-w-[1140px] px-10 py-8">
         <h3 className="text-gray-700 text-3xl font-bold">
-          팀 {modeInfo.mode === CODE.MODE_CREATE ? '등록' : '수정'}
+          경기장소 {modeInfo.mode === CODE.MODE_CREATE ? '등록' : '수정'}
         </h3>
 
         <div className="mt-8">
           <div className="shadow rounded-lg overflow-hidden border border-gray-200">
             <table className="w-full table-fixed bg-white">
               <tbody className="text-gray-900 text-sm font-medium">
-                {/* 팀명 */}
+                {/* 장소명 */}
                 <tr className="border-b border-gray-200">
                   <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
-                    팀명
+                    장소명
                   </th>
 
                   <td className="px-6 py-4">
                     <input
                       className="h-10 w-64 px-3 bg-gray-100 rounded"
                       type="text"
-                      value={teamInfo.teamNm || ''}
+                      value={venueInfo.venueNm || ''}
                       onChange={e =>
-                        setTeamInfo(prev => ({
+                        setVenueInfo(prev => ({
                           ...prev,
-                          teamNm: e.target.value,
-                        }))
-                      }
-                    />
-                  </td>
-                </tr>
-
-                {/* 창단년도 */}
-                <tr className="border-b border-gray-200">
-                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
-                    창단년도
-                  </th>
-
-                  <td className="px-6 py-4">
-                    <input
-                      className="h-10 w-64 px-3 bg-gray-100 rounded"
-                      type="number"
-                      min="1800"
-                      max={new Date().getFullYear()}
-                      value={teamInfo.foundYear || ''}
-                      onChange={e =>
-                        setTeamInfo(prev => ({
-                          ...prev,
-                          foundYear: e.target.value,
+                          venueNm: e.target.value,
                         }))
                       }
                     />
@@ -240,7 +181,7 @@ const AdminTeamEdit = props => {
                       <div className="flex gap-3">
                         <input
                           className="h-10 w-40 px-3 bg-gray-100 rounded"
-                          value={teamInfo.postcode || ''}
+                          value={venueInfo.postcode || ''}
                           readOnly
                           placeholder="우편번호"
                         />
@@ -255,7 +196,7 @@ const AdminTeamEdit = props => {
 
                       <input
                         className="h-10 w-96 px-3 bg-gray-100 rounded"
-                        value={teamInfo.address || ''}
+                        value={venueInfo.address || ''}
                         readOnly
                         placeholder="주소"
                       />
@@ -263,61 +204,16 @@ const AdminTeamEdit = props => {
                       <input
                         className="h-10 w-96 px-3 bg-gray-100 rounded"
                         ref={detailAddressRef}
-                        value={teamInfo.detailAddress || ''}
+                        value={venueInfo.detailAddress || ''}
                         placeholder="상세주소"
                         onChange={e =>
-                          setTeamInfo(prev => ({
+                          setVenueInfo(prev => ({
                             ...prev,
                             detailAddress: e.target.value,
                           }))
                         }
                       />
                     </div>
-                  </td>
-                </tr>
-
-                {/* 이미지 */}
-                <tr>
-                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
-                    사진 첨부
-                  </th>
-
-                  <td className="px-6 py-4">
-                    <label className="cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
-                      파일 선택
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </label>
-
-                    {teamInfo.teamFile?.length > 0 ? (
-                      <div className="mt-3">
-                        <img
-                          src={preview}
-                          alt="preview"
-                          className="w-32 h-32 object-cover rounded border"
-                        />
-
-                        <p className="text-sm text-gray-600 mt-1">
-                          {teamInfo.teamFile[0].name}
-                        </p>
-                      </div>
-                    ) : teamInfo.storedFileName ? (
-                      <div className="mt-3">
-                        <img
-                          src={teamInfo.storedFileName}
-                          alt={teamInfo.originalFileName}
-                          className="w-32 h-32 object-cover rounded border"
-                        />
-
-                        <p className="text-xs text-gray-500">
-                          현재 등록된 이미지
-                        </p>
-                      </div>
-                    ) : null}
                   </td>
                 </tr>
               </tbody>
@@ -346,4 +242,4 @@ const AdminTeamEdit = props => {
   );
 };
 
-export default AdminTeamEdit;
+export default AdminVenueEdit;
