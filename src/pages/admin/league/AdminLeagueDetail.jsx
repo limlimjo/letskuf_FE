@@ -128,9 +128,15 @@ const AdminLeagueDetail = () => {
       resp => {
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('경기장이 추가되었습니다.');
-
           // 현재 사용 경기장 목록 업데이트
-          setVenueList(prev => [...prev, item]);
+          setVenueList(prev => [
+            ...prev,
+            {
+              venueId: item.venueId,
+              name: item.venueNm,
+              address: item.address,
+            },
+          ]);
         } else {
           alert(resp.resultMessage || '경기장 추가 실패');
         }
