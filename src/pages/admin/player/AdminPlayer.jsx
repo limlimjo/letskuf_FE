@@ -33,13 +33,13 @@ const AdminPlayer = () => {
 
         let mutListTag = [];
 
-        resp.result.resultList.forEach((item, index) => {
+        resp.result.resultList.forEach((item, idx) => {
           mutListTag.push(
             <tr
               key={item.playerId}
               className="border-b border-gray-200 hover:bg-gray-50"
             >
-              <td className="px-6 py-3">{item.playerId}</td>
+              <td className="px-6 py-3">{idx + 1}</td>
 
               <td className="px-6 py-3">{item.name}</td>
 

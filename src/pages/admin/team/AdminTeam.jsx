@@ -33,10 +33,10 @@ const AdminTeam = () => {
 
         let mutListTag = [];
 
-        resp.result.resultList.forEach(function (item) {
+        resp.result.resultList.forEach(function (item, idx) {
           mutListTag.push(
             <tr key={item.teamId} className="border-b border-gray-200">
-              <td className="px-6 py-3">{item.teamId}</td>
+              <td className="px-6 py-3">{idx + 1}</td>
 
               <td className="px-6 py-3 font-medium">
                 <Link
