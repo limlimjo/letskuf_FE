@@ -17,6 +17,7 @@ import { useParams } from 'react-router-dom';
 import AdminMatch from '../pages/admin/match/AdminMatch';
 import AdminVenue from '../pages/admin/venue/AdminVenue';
 import AdminVenueEdit from '../pages/admin/venue/AdminVenueEdit';
+import AdminMatchEdit from '../pages/admin/match/AdminMatchEdit';
 
 function AdminTeamEditWithParams(props) {
   const { teamId } = useParams();
@@ -98,6 +99,10 @@ const RootRoutes = () => {
             element={<AdminVenueEditWithParams />}
           />
           <Route path={URL.ADMIN_MATCH} element={<AdminMatch />} />
+          <Route
+            path={URL.ADMIN_MATCH_CREATE}
+            element={<AdminMatchEdit mode={CODE.MODE_CREATE} />}
+          />
         </Routes>
       </div>
     </>

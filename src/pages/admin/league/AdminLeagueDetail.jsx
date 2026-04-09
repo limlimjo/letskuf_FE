@@ -264,11 +264,11 @@ const AdminLeagueDetail = () => {
                   />
                 </>
               ) : (
-                <span className="w-56 px-6 py-2 bg-gray-100 rounded">
+                <div className="w-70 px-6 py-2 bg-gray-100 rounded">
                   {leagueInfo.startDate && leagueInfo.endDate
                     ? `${leagueInfo.startDate.replace(/-/g, '.')} ~ ${leagueInfo.endDate.replace(/-/g, '.')}`
                     : '기간 없음'}
-                </span>
+                </div>
               )}
             </div>
 

@@ -28,7 +28,7 @@ export function requestFetch(url, requestOptions, handler, errorHandler) {
       if (typeof handler === 'function') {
         handler(resp);
       } else {
-        console.log('egov fetch handler not assigned!');
+        console.log('fetch handler not assigned!');
       }
       console.groupEnd('requestFetch.then()');
     })
@@ -40,7 +40,7 @@ export function requestFetch(url, requestOptions, handler, errorHandler) {
       if (typeof errorHandler === 'function') {
         errorHandler(error);
       } else {
-        console.error('egov error handler not assigned!');
+        console.error('error handler not assigned!');
         alert('ERR : ' + error.message);
       }
     })

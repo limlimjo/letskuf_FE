@@ -89,18 +89,12 @@ const LeftMenuAdmin = () => {
           >
             경기 목록
           </NavLink>
-          <a
-            href="#"
+          <NavLink
+            to={URL.ADMIN_MATCH_CREATE}
             className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
           >
             경기 등록
-          </a>
-          <a
-            href="#"
-            className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
-          >
-            실시간 경기 등록
-          </a>
+          </NavLink>
         </div>
       </nav>
     </aside>

@@ -17,7 +17,7 @@ const URL = {
   ADMIN_LEAGUE: '/admin/league',
   ADMIN_LEAGUE_DETAIL: '/admin/league/:leagueId',
   ADMIN_LEAGUE_CREATE: '/admin/league/create',
-  ADMIN_LEAGUE_MODIFY: '/admin/league/modify',
+  ADMIN_LEAGUE_MODIFY: '/admin/league/:leagueId/modify',
 
   //ADMIN-VENUE
   ADMIN_VENUE: '/admin/venue',
@@ -29,7 +29,8 @@ const URL = {
   ADMIN_MATCH: '/admin/match',
   ADMIN_MATCH_DETAIL: '/admin/match/:matchId',
   ADMIN_MATCH_CREATE: '/admin/match/create',
-  ADMIN_MATCH_MODIFY: '/admin/match/modify',
+  ADMIN_MATCH_MODIFY: '/admin/match/:matchId/modify',
+  ADMIN_MATCH_DETAIL_LIVE: '/admin/match/:matchId/live',
 };
 
 export default URL;

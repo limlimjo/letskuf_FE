@@ -28,7 +28,7 @@ const AdminLeagueEdit = props => {
         setModeInfo({
           ...modeInfo,
           modeTitle: '수정',
-          editURL: `/admin/league/modify/${props.leagueId}`,
+          editURL: `/admin/league/${props.leagueId}/modify`,
         });
         break;
     }
@@ -42,24 +42,33 @@ const AdminLeagueEdit = props => {
   // 등록/수정 버튼 클릭
   const handleOnUpdate = async () => {
     console.log('등록 버튼');
-    const formData = new FormData();
+    const requestData = {};
     for (let key in leagueInfo) {
       if (leagueInfo[key] !== null && leagueInfo[key] !== undefined) {
         // 일반 필드들 처리
-        formData.append(key, leagueInfo[key]);
+        requestData[key] = leagueInfo[key];
       }
     }
-    formData.append('type', tabType);
+    requestData.type = tabType;
 
     // 유효성 검사
-    if (formValidatorLeague(formData, tabType)) {
-      console.log('formData 출력');
-      console.log(formData);
-      let apiUrl = '/api/registerLeague.do';
+    if (formValidatorLeague(requestData, tabType)) {
+      console.log('requestData 출력');
+      console.log(requestData);
+
+      let apiUrl = '';
+      if (modeInfo.mode === CODE.MODE_CREATE) {
+        apiUrl = '/api/registerLeague.do';
+      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+        apiUrl = '/api/updateLeague.do';
+      }
 
       const requestOptions = {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
       };
 
       // API 호출

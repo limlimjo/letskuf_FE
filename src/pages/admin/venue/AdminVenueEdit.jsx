@@ -77,23 +77,32 @@ const AdminVenueEdit = props => {
   // 등록/수정 버튼 클릭
   const handleOnUpdate = async () => {
     console.log('등록 버튼');
-    const formData = new FormData();
+    const requestData = {};
     for (let key in venueInfo) {
       if (venueInfo[key] !== null && venueInfo[key] !== undefined) {
         // 일반 필드들 처리
-        formData.append(key, venueInfo[key]);
+        requestData[key] = venueInfo[key];
       }
     }
 
     // 유효성 검사
-    if (formValidatorVenue(formData)) {
-      console.log('formData 출력');
-      console.log(formData);
-      let apiUrl = '/api/registerVenue.do';
+    if (formValidatorVenue(requestData)) {
+      console.log('requestData 출력');
+      console.log(requestData);
+
+      let apiUrl = '';
+      if (modeInfo.mode === CODE.MODE_CREATE) {
+        apiUrl = '/api/registerVenue.do';
+      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+        apiUrl = '/api/updateVenue.do';
+      }
 
       const requestOptions = {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
       };
 
       // API 호출

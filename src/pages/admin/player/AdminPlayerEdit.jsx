@@ -338,7 +338,7 @@ const AdminPlayerEdit = props => {
                       </th>
 
                       <td
-                        colSpan={3}
+                        colSpan={4}
                         className="px-6 py-4 flex gap-10 items-center"
                       >
                         <div className="flex items-center gap-3">
@@ -409,6 +409,29 @@ const AdminPlayerEdit = props => {
                             }}
                           />
                         </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500 w-14">
+                            소속연도
+                          </span>
+                          <input
+                            className="h-10 w-24 px-2 bg-gray-100 rounded"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={playerInfo.joinYear || ''}
+                            onChange={e => {
+                              const value = e.target.value;
+                              // 음수 입력 방지
+                              if (value === '' || Number(value) >= 0) {
+                                setPlayerInfo(prev => ({
+                                  ...prev,
+                                  joinYear: value,
+                                }));
+                              }
+                            }}
+                          />
+                          <span className="text-sm text-gray-500">년</span>
+                        </div>
                       </td>
                     </tr>
 
@@ -441,7 +464,6 @@ const AdminPlayerEdit = props => {
                                 }));
                               }
                             }}
-                            placeholder="예) 180"
                           />
                           <span className="text-sm text-gray-500">cm</span>
                         </div>
@@ -466,7 +488,6 @@ const AdminPlayerEdit = props => {
                                 }));
                               }
                             }}
-                            placeholder="예) 75"
                           />
                           <span className="text-sm text-gray-500">kg</span>
                         </div>
