@@ -10,26 +10,32 @@ const AdminTeamDetail = () => {
   const [coachInfo, setCoachInfo] = useState([]);
   const [playerInfo, setPlayerInfo] = useState([]);
 
-  const retrieveList = useCallback(() => {
-    console.log('useCallback 시작');
+  const retrieveList = useCallback(async () => {
+    try {
+      console.log('useCallback 시작');
 
-    const retrieveListURL =
-      '/api/retrieveTeamDetail.do' + ApiFetch.getQueryString({ teamId });
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        'Content-type': 'application/json',
-      },
-    };
+      const retrieveListURL =
+        '/api/retrieveTeamDetail.do' + ApiFetch.getQueryString({ teamId });
 
-    ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json',
+        },
+      };
+
+      const resp = await ApiFetch.requestFetch(retrieveListURL, requestOptions);
+
       console.log('api 호출결과');
       console.log(resp);
 
       setTeamInfo(resp.result.team);
       setCoachInfo(resp.result.coaches || []);
       setPlayerInfo(resp.result.players || []);
-    });
+    } catch (e) {
+      console.error(e);
+      alert('팀 상세 조회 실패');
+    }
   }, [teamId]);
 
   useEffect(() => {

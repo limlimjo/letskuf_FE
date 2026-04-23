@@ -16,92 +16,95 @@ const AdminVenue = () => {
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
 
-  const retrieveList = useCallback(
-    srchCond => {
+  const retrieveList = useCallback(async srchCond => {
+    try {
       const retrieveListURL =
         '/api/retrieveVenue.do' + ApiFetch.getQueryString(srchCond);
 
-      const requestOptions = {
+      const resp = await ApiFetch.requestFetch(retrieveListURL, {
         method: 'GET',
         headers: {
           'Content-type': 'application/json',
         },
-      };
-
-      ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
-        setPaginationInfo(resp.result.paginationInfo);
-
-        let mutListTag = [];
-
-        resp.result.resultList.forEach(function (item) {
-          mutListTag.push(
-            <tr key={item.venueId} className="border-b border-gray-200">
-              <td className="px-6 py-3">{item.venueId}</td>
-              <td className="px-6 py-3 font-medium">{item.venueNm}</td>
-              <td className="px-6 py-3">{item.address}</td>
-              <td className="px-6 py-3">
-                <Link
-                  to={`/admin/venue/${item.venueId}/modify`}
-                  className="bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 transition mr-2"
-                >
-                  수정
-                </Link>
-
-                <button
-                  onClick={() => handleOnDelete(item.venueId)}
-                  className="bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200 transition"
-                >
-                  삭제
-                </button>
-              </td>
-            </tr>,
-          );
-        });
-
-        if (!mutListTag.length) {
-          mutListTag.push(
-            <tr key="empty">
-              <td colSpan={5} className="py-10 text-center text-gray-500">
-                검색결과가 없습니다.
-              </td>
-            </tr>,
-          );
-        }
-
-        setListTag(mutListTag);
       });
-    },
-    [searchCondition],
-  );
+
+      setPaginationInfo(resp.result.paginationInfo);
+
+      let mutListTag = [];
+
+      resp.result.resultList.forEach(item => {
+        mutListTag.push(
+          <tr key={item.venueId} className="border-b border-gray-200">
+            <td className="px-6 py-3">{item.venueId}</td>
+            <td className="px-6 py-3 font-medium">{item.venueNm}</td>
+            <td className="px-6 py-3">{item.address}</td>
+            <td className="px-6 py-3">
+              <Link
+                to={`/admin/venue/${item.venueId}/modify`}
+                className="bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 transition mr-2"
+              >
+                수정
+              </Link>
+
+              <button
+                onClick={() => handleOnDelete(item.venueId)}
+                className="bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200 transition"
+              >
+                삭제
+              </button>
+            </td>
+          </tr>,
+        );
+      });
+
+      if (!mutListTag.length) {
+        mutListTag.push(
+          <tr key="empty">
+            <td colSpan={5} className="py-10 text-center text-gray-500">
+              검색결과가 없습니다.
+            </td>
+          </tr>,
+        );
+      }
+
+      setListTag(mutListTag);
+    } catch (e) {
+      console.error(e);
+      alert('목록 조회 실패');
+    }
+  }, []);
 
   const handleOnDelete = useCallback(
-    teamId => {
+    async venueId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
-      const deleteUrl = `/api/deleteVenue.do?teamId=${teamId}`;
+      try {
+        const deleteUrl = `/api/deleteVenue.do?venueId=${venueId}`;
 
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
+        const resp = await ApiFetch.requestFetch(deleteUrl, {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+        });
 
-      ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('삭제되었습니다.');
           retrieveList(searchCondition);
         } else {
           alert('삭제 실패');
         }
-      });
+      } catch (e) {
+        console.error(e);
+        alert('서버 오류');
+      }
     },
     [retrieveList, searchCondition],
   );
 
   useEffect(() => {
     retrieveList(searchCondition);
-  }, []);
+  }, [retrieveList, searchCondition]);
 
   return (
     <main className="flex-1 bg-gray-200 min-h-screen">

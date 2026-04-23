@@ -16,78 +16,79 @@ const AdminPlayer = () => {
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
 
-  const retrieveList = useCallback(
-    srchCond => {
-      const retrieveListURL =
-        '/api/retrievePlayer.do' + ApiFetch.getQueryString(srchCond);
+  const retrieveList = useCallback(async srchCond => {
+    const retrieveListURL =
+      '/api/retrievePlayer.do' + ApiFetch.getQueryString(srchCond);
 
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-type': 'application/json',
+      },
+    };
 
-      ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
-        setPaginationInfo(resp.result.paginationInfo);
+    try {
+      const resp = await ApiFetch.requestFetch(retrieveListURL, requestOptions);
 
-        let mutListTag = [];
+      setPaginationInfo(resp.result.paginationInfo);
 
-        resp.result.resultList.forEach((item, idx) => {
-          mutListTag.push(
-            <tr
-              key={item.playerId}
-              className="border-b border-gray-200 hover:bg-gray-50"
-            >
-              <td className="px-6 py-3">{idx + 1}</td>
+      let mutListTag = [];
 
-              <td className="px-6 py-3">{item.name}</td>
+      resp.result.resultList.forEach((item, idx) => {
+        mutListTag.push(
+          <tr
+            key={item.playerId}
+            className="border-b border-gray-200 hover:bg-gray-50"
+          >
+            <td className="px-6 py-3">{idx + 1}</td>
 
-              <td className="px-6 py-3">{item.teamNm}</td>
+            <td className="px-6 py-3">{item.name}</td>
 
-              <td className="px-6 py-3">{item.position}</td>
+            <td className="px-6 py-3">{item.teamNm}</td>
 
-              <td className="px-6 py-3">{item.uniformNum}</td>
+            <td className="px-6 py-3">{item.position}</td>
 
-              <td className="px-6 py-3">{item.grade}</td>
+            <td className="px-6 py-3">{item.uniformNum}</td>
 
-              <td className="px-6 py-3">
-                <Link
-                  to={`/admin/player/${item.playerId}/modify`}
-                  className="bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 mr-2"
-                >
-                  수정
-                </Link>
+            <td className="px-6 py-3">{item.grade}</td>
 
-                <button
-                  onClick={() => handleOnDelete(item.playerId)}
-                  className="bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200"
-                >
-                  삭제
-                </button>
-              </td>
-            </tr>,
-          );
-        });
+            <td className="px-6 py-3">
+              <Link
+                to={`/admin/player/${item.playerId}/modify`}
+                className="bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 mr-2"
+              >
+                수정
+              </Link>
 
-        if (!mutListTag.length) {
-          mutListTag.push(
-            <tr key="empty">
-              <td colSpan={7} className="py-10 text-center text-gray-500">
-                검색결과가 없습니다.
-              </td>
-            </tr>,
-          );
-        }
-
-        setListTag(mutListTag);
+              <button
+                onClick={() => handleOnDelete(item.playerId)}
+                className="bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200"
+              >
+                삭제
+              </button>
+            </td>
+          </tr>,
+        );
       });
-    },
-    [searchCondition],
-  );
+
+      if (!mutListTag.length) {
+        mutListTag.push(
+          <tr key="empty">
+            <td colSpan={7} className="py-10 text-center text-gray-500">
+              검색결과가 없습니다.
+            </td>
+          </tr>,
+        );
+      }
+
+      setListTag(mutListTag);
+    } catch (error) {
+      console.error('선수 목록 조회 실패:', error);
+    }
+  }, []);
 
   const handleOnDelete = useCallback(
-    playerId => {
+    async playerId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
       const deleteUrl = `/api/deletePlayer.do?playerId=${playerId}`;
@@ -99,21 +100,26 @@ const AdminPlayer = () => {
         },
       };
 
-      ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
+      try {
+        const resp = await ApiFetch.requestFetch(deleteUrl, requestOptions);
+
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('삭제되었습니다.');
           retrieveList(searchCondition);
         } else {
           alert('삭제에 실패했습니다.');
         }
-      });
+      } catch (error) {
+        console.error('삭제 실패:', error);
+        alert('삭제 중 오류 발생');
+      }
     },
     [retrieveList, searchCondition],
   );
 
   useEffect(() => {
     retrieveList(searchCondition);
-  }, []);
+  }, [retrieveList, searchCondition]);
 
   return (
     <main className="flex-1 bg-gray-200 min-h-screen">

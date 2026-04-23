@@ -19,7 +19,7 @@ const AdminLeague = () => {
   const [listTag, setListTag] = useState([]);
 
   const retrieveList = useCallback(
-    srchCond => {
+    async srchCond => {
       const params = { ...srchCond, type: tabType };
 
       const retrieveListURL =
@@ -32,12 +32,17 @@ const AdminLeague = () => {
         },
       };
 
-      ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
+      try {
+        const resp = await ApiFetch.requestFetch(
+          retrieveListURL,
+          requestOptions,
+        );
+
         setPaginationInfo(resp.result.paginationInfo);
 
         let mutListTag = [];
 
-        resp.result.resultList.forEach(function (item, idx) {
+        resp.result.resultList.forEach((item, idx) => {
           mutListTag.push(
             <tr key={item.leagueId} className="border-b border-gray-200">
               <td className="px-6 py-3 w-16">{idx + 1}</td>
@@ -82,13 +87,15 @@ const AdminLeague = () => {
         }
 
         setListTag(mutListTag);
-      });
+      } catch (error) {
+        console.error('리스트 조회 실패:', error);
+      }
     },
     [tabType],
   );
 
   const handleOnDelete = useCallback(
-    leagueId => {
+    async leagueId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
       const deleteUrl = `/api/deleteLeague.do?leagueId=${leagueId}`;
@@ -100,14 +107,19 @@ const AdminLeague = () => {
         },
       };
 
-      ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
+      try {
+        const resp = await ApiFetch.requestFetch(deleteUrl, requestOptions);
+
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('삭제되었습니다.');
           retrieveList(searchCondition);
         } else {
           alert('삭제 실패');
         }
-      });
+      } catch (error) {
+        console.error('삭제 실패:', error);
+        alert('삭제 중 오류 발생');
+      }
     },
     [retrieveList, searchCondition],
   );

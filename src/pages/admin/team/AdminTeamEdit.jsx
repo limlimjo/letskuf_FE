@@ -91,77 +91,69 @@ const AdminTeamEdit = props => {
 
   // 등록/수정 버튼 클릭
   const handleOnUpdate = async () => {
-    console.log('등록 버튼');
-    const formData = new FormData();
-    for (let key in teamInfo) {
-      if (key === 'teamId') continue; // teamId는 루프에서 제외
-      if (key === 'teamFile') {
-        if (teamInfo[key].length > 0) {
-          // 파일이 있을 때
-          teamInfo[key].forEach(file => {
-            formData.append('teamFile', file);
-          });
-        } else {
-          // 파일이 없을 때 빈 파일 추가
-          formData.append('teamFile', new File([], ''));
-        }
-      } else if (teamInfo[key] !== null && teamInfo[key] !== undefined) {
-        // 일반 필드들 처리
-        formData.append(key, teamInfo[key]);
-      }
-    }
+    try {
+      const formData = new FormData();
 
-    // 유효성 검사
-    if (formValidatorTeam(formData)) {
-      console.log('formData 출력');
-      console.log(formData);
+      for (let key in teamInfo) {
+        if (key === 'teamId') continue;
+
+        if (key === 'teamFile') {
+          if (teamInfo[key].length > 0) {
+            teamInfo[key].forEach(file => {
+              formData.append('teamFile', file);
+            });
+          } else {
+            formData.append('teamFile', new File([], ''));
+          }
+        } else if (teamInfo[key] !== null && teamInfo[key] !== undefined) {
+          formData.append(key, teamInfo[key]);
+        }
+      }
+
+      if (!formValidatorTeam(formData)) return;
 
       let apiUrl = '';
       if (modeInfo.mode === CODE.MODE_CREATE) {
         apiUrl = '/api/registerTeam.do';
-      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+      } else {
         apiUrl = '/api/updateTeam.do';
-        console.log('props.teamId : ', props.teamId);
-        formData.append('teamId', props.teamId); // 수정 모드일 때 팀 ID 추가
+        formData.append('teamId', props.teamId);
       }
 
-      const requestOptions = {
+      const resp = await ApiFetch.requestFetch(apiUrl, {
         method: 'POST',
         body: formData,
-      };
-
-      // API 호출
-      ApiFetch.requestFetch(apiUrl, requestOptions, resp => {
-        console.log('api 호출');
-        console.log(resp);
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          navigate({ pathname: URL.ADMIN_TEAM });
-        } else {
-          console.error('error');
-        }
       });
+
+      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+        navigate({ pathname: URL.ADMIN_TEAM });
+      } else {
+        alert('저장 실패');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('서버 오류가 발생했습니다.');
     }
   };
 
   // 팀 정보 조회 (수정 모드일 때)
   const fetchTeamInfo = async () => {
     try {
-      console.log('팀 정보 조회 시작');
-      ApiFetch.requestFetch(
+      const resp = await ApiFetch.requestFetch(
         `/api/retrieveUpdateTeamDetail.do?teamId=${props.teamId}`,
         { method: 'GET' },
-        resp => {
-          if (resp && resp.result) {
-            setTeamInfo({
-              ...resp.result.team,
-              teamFile: [],
-              originalFileName: resp.result.teamFile?.originalFileName || '', // 파일명만 저장
-              storedFileName: resp.result.teamFile?.storedFileName || '', // 이미지 URL 저장
-            });
-          }
-        },
       );
+
+      if (resp && resp.result) {
+        setTeamInfo({
+          ...resp.result.team,
+          teamFile: [],
+          originalFileName: resp.result.teamFile?.originalFileName || '',
+          storedFileName: resp.result.teamFile?.storedFileName || '',
+        });
+      }
     } catch (e) {
+      console.error(e);
       alert('팀 정보를 불러오지 못했습니다.');
     }
   };

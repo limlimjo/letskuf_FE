@@ -16,88 +16,89 @@ const AdminMatch = () => {
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
 
-  const retrieveList = useCallback(
-    srchCond => {
-      const retrieveListURL =
-        '/api/retrieveMatch.do' + ApiFetch.getQueryString(srchCond);
+  const retrieveList = useCallback(async srchCond => {
+    const retrieveListURL =
+      '/api/retrieveMatch.do' + ApiFetch.getQueryString(srchCond);
 
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-type': 'application/json',
+      },
+    };
 
-      ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
-        setPaginationInfo(resp.result.paginationInfo);
+    try {
+      const resp = await ApiFetch.requestFetch(retrieveListURL, requestOptions);
 
-        let mutListTag = [];
+      setPaginationInfo(resp.result.paginationInfo);
 
-        resp.result.resultList.forEach(function (item, idx) {
-          mutListTag.push(
-            <tr key={item.matchId} className="border-b border-gray-200">
-              <td className="px-6 py-3">{idx + 1}</td>
+      let mutListTag = [];
 
-              <td className="px-6 py-3">{item.leagueNm}</td>
+      resp.result.resultList.forEach((item, idx) => {
+        mutListTag.push(
+          <tr key={item.matchId} className="border-b border-gray-200">
+            <td className="px-6 py-3">{idx + 1}</td>
 
-              <td className="px-6 py-3">
-                {item.homeTeamNm} vs {item.awayTeamNm}
-              </td>
+            <td className="px-6 py-3">{item.leagueNm}</td>
 
-              <td className="px-6 py-3">
-                {item.matchDate} {item.kickoffTime?.substring(0, 5)}
-              </td>
+            <td className="px-6 py-3">
+              {item.homeTeamNm} vs {item.awayTeamNm}
+            </td>
 
-              <td className="px-6 py-3">{item.venueNm}</td>
+            <td className="px-6 py-3">
+              {item.matchDate} {item.kickoffTime?.substring(0, 5)}
+            </td>
 
-              <td className="px-6 py-3 whitespace-nowrap" colSpan={3}>
-                <div className="flex flex-col gap-2">
+            <td className="px-6 py-3">{item.venueNm}</td>
+
+            <td className="px-6 py-3 whitespace-nowrap" colSpan={3}>
+              <div className="flex flex-col gap-2">
+                <Link
+                  to={`/admin/match/${item.matchId}/live`}
+                  className="w-full bg-blue-100 text-blue-800 px-3 py-1 text-xs rounded font-semibold hover:bg-blue-200 transition"
+                >
+                  실시간
+                </Link>
+
+                <div className="flex gap-2 w-full">
                   <Link
-                    to={`/admin/match/${item.matchId}/live`}
-                    className="w-full bg-blue-100 text-blue-800 px-3 py-1 text-xs rounded font-semibold hover:bg-blue-200 transition"
+                    to={`/admin/match/${item.matchId}/modify`}
+                    className="w-full bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 transition"
                   >
-                    실시간
+                    수정
                   </Link>
 
-                  <div className="flex gap-2 w-full">
-                    <Link
-                      to={`/admin/match/${item.matchId}/modify`}
-                      className="w-full bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 transition"
-                    >
-                      수정
-                    </Link>
-
-                    <button
-                      className="w-full bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200 transition"
-                      onClick={() => handleOnDelete(item.matchId)}
-                    >
-                      삭제
-                    </button>
-                  </div>
+                  <button
+                    className="w-full bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200 transition"
+                    onClick={() => handleOnDelete(item.matchId)}
+                  >
+                    삭제
+                  </button>
                 </div>
-              </td>
-            </tr>,
-          );
-        });
-
-        if (!mutListTag.length) {
-          mutListTag.push(
-            <tr key="empty">
-              <td colSpan={5} className="py-10 text-center text-gray-500">
-                검색결과가 없습니다.
-              </td>
-            </tr>,
-          );
-        }
-
-        setListTag(mutListTag);
+              </div>
+            </td>
+          </tr>,
+        );
       });
-    },
-    [searchCondition],
-  );
+
+      if (!mutListTag.length) {
+        mutListTag.push(
+          <tr key="empty">
+            <td colSpan={5} className="py-10 text-center text-gray-500">
+              검색결과가 없습니다.
+            </td>
+          </tr>,
+        );
+      }
+
+      setListTag(mutListTag);
+    } catch (error) {
+      console.error('경기 목록 조회 실패:', error);
+    }
+  }, []);
 
   const handleOnDelete = useCallback(
-    matchId => {
+    async matchId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
       const deleteUrl = `/api/deleteMatch.do?matchId=${matchId}`;
@@ -109,14 +110,19 @@ const AdminMatch = () => {
         },
       };
 
-      ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
+      try {
+        const resp = await ApiFetch.requestFetch(deleteUrl, requestOptions);
+
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('삭제되었습니다.');
           retrieveList(searchCondition);
         } else {
           alert('삭제 실패');
         }
-      });
+      } catch (error) {
+        console.error('삭제 실패:', error);
+        alert('삭제 중 오류 발생');
+      }
     },
     [retrieveList, searchCondition],
   );

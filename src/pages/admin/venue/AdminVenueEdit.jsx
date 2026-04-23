@@ -76,65 +76,59 @@ const AdminVenueEdit = props => {
 
   // 등록/수정 버튼 클릭
   const handleOnUpdate = async () => {
-    console.log('등록 버튼');
-    const requestData = {};
-    for (let key in venueInfo) {
-      if (venueInfo[key] !== null && venueInfo[key] !== undefined) {
-        // 일반 필드들 처리
-        requestData[key] = venueInfo[key];
-      }
-    }
+    try {
+      const requestData = {};
 
-    // 유효성 검사
-    if (formValidatorVenue(requestData)) {
-      console.log('requestData 출력');
-      console.log(requestData);
+      for (let key in venueInfo) {
+        if (venueInfo[key] !== null && venueInfo[key] !== undefined) {
+          requestData[key] = venueInfo[key];
+        }
+      }
+
+      if (!formValidatorVenue(requestData)) return;
 
       let apiUrl = '';
       if (modeInfo.mode === CODE.MODE_CREATE) {
         apiUrl = '/api/registerVenue.do';
-      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+      } else {
         apiUrl = '/api/updateVenue.do';
+        requestData.venueId = props.venueId; // 수정 시 ID 추가
       }
 
-      const requestOptions = {
+      const resp = await ApiFetch.requestFetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestData),
-      };
-
-      // API 호출
-      ApiFetch.requestFetch(apiUrl, requestOptions, resp => {
-        console.log('api 호출');
-        console.log(resp);
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          navigate({ pathname: URL.ADMIN_VENUE });
-        } else {
-          console.error('error');
-          alert('경기장소 등록에 실패하였습니다.');
-        }
       });
+
+      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+        navigate({ pathname: URL.ADMIN_VENUE });
+      } else {
+        alert('경기장소 등록/수정 실패');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('서버 오류가 발생했습니다.');
     }
   };
 
   // 경기장소 정보 조회 (수정 모드일 때)
   const fetchVenueInfo = async () => {
     try {
-      console.log('경기장소 정보 조회 시작');
-      ApiFetch.requestFetch(
+      const resp = await ApiFetch.requestFetch(
         `/api/retrieveVenueDetail.do?venueId=${props.venueId}`,
         { method: 'GET' },
-        resp => {
-          if (resp && resp.result) {
-            setVenueInfo({
-              ...resp.result.venue,
-            });
-          }
-        },
       );
+
+      if (resp && resp.result) {
+        setVenueInfo({
+          ...resp.result.venue,
+        });
+      }
     } catch (e) {
+      console.error(e);
       alert('경기장소 정보를 불러오지 못했습니다.');
     }
   };
@@ -144,7 +138,7 @@ const AdminVenueEdit = props => {
     if (props.mode === CODE.MODE_MODIFY && props.venueId) {
       fetchVenueInfo();
     }
-  }, []);
+  }, [props.mode, props.venueId]);
 
   return (
     <main className="flex-1 bg-gray-200 min-h-screen">

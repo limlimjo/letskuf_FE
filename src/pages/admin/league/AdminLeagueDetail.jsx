@@ -24,7 +24,7 @@ const AdminLeagueDetail = () => {
 
   const [venueList, setVenueList] = useState([]);
 
-  const retrieveList = useCallback(() => {
+  const retrieveList = useCallback(async () => {
     const retrieveListURL =
       '/api/retrieveLeagueDetail.do' + ApiFetch.getQueryString({ leagueId });
 
@@ -35,10 +35,14 @@ const AdminLeagueDetail = () => {
       },
     };
 
-    ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
+    try {
+      const resp = await ApiFetch.requestFetch(retrieveListURL, requestOptions);
+
       setLeagueInfo(resp.result.league || {});
       setVenueList(resp.result.venue || []);
-    });
+    } catch (error) {
+      console.error('상세 조회 실패:', error);
+    }
   }, [leagueId]);
 
   // 취소 버튼 클릭
@@ -47,7 +51,7 @@ const AdminLeagueDetail = () => {
   };
 
   // 리그/대회 수정 버튼 클릭
-  const handleEditOrSave = useCallback(() => {
+  const handleEditOrSave = useCallback(async () => {
     if (isEditing) {
       const sendData = { ...formData, leagueId };
 
@@ -59,7 +63,12 @@ const AdminLeagueDetail = () => {
         body: JSON.stringify(sendData),
       };
 
-      ApiFetch.requestFetch('/api/updateLeague.do', requestOptions, resp => {
+      try {
+        const resp = await ApiFetch.requestFetch(
+          '/api/updateLeague.do',
+          requestOptions,
+        );
+
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('리그/대회 정보가 수정되었습니다.');
           setIsEditing(false);
@@ -67,7 +76,9 @@ const AdminLeagueDetail = () => {
         } else {
           alert('리그/대회 정보 수정 실패');
         }
-      });
+      } catch (error) {
+        console.error('수정 실패:', error);
+      }
     } else {
       setFormData(leagueInfo);
       setIsEditing(true);
@@ -75,7 +86,7 @@ const AdminLeagueDetail = () => {
   }, [isEditing, formData, leagueId, leagueInfo, retrieveList]);
 
   // 경기장 검색 버튼 클릭
-  const handleSearchVenue = pageIndex => {
+  const handleSearchVenue = async pageIndex => {
     if (!keyword.trim()) {
       alert('검색어를 입력하세요.');
       return;
@@ -97,20 +108,21 @@ const AdminLeagueDetail = () => {
       },
     };
 
-    ApiFetch.requestFetch(searchURL, requestOptions, resp => {
+    try {
+      const resp = await ApiFetch.requestFetch(searchURL, requestOptions);
+
       if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
         setSearchVenueList(resp.result.resultList || []);
         setPaginationInfo(resp.result.paginationInfo || {});
       } else {
         alert('경기장 검색 실패');
       }
-    });
+    } catch (error) {
+      console.error('검색 실패:', error);
+    }
   };
-
   // 경기장 추가 버튼 클릭
-  const handleAddVenue = item => {
-    console.log('item 출력: ' + item.venueId);
-    console.log('leagueId 출력: ' + leagueId);
+  const handleAddVenue = async item => {
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -122,30 +134,33 @@ const AdminLeagueDetail = () => {
       }),
     };
 
-    ApiFetch.requestFetch(
-      '/api/registerLeagueVenue.do',
-      requestOptions,
-      resp => {
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          alert('경기장이 추가되었습니다.');
-          // 현재 사용 경기장 목록 업데이트
-          setVenueList(prev => [
-            ...prev,
-            {
-              venueId: item.venueId,
-              name: item.venueNm,
-              address: item.address,
-            },
-          ]);
-        } else {
-          alert(resp.resultMessage || '경기장 추가 실패');
-        }
-      },
-    );
+    try {
+      const resp = await ApiFetch.requestFetch(
+        '/api/registerLeagueVenue.do',
+        requestOptions,
+      );
+
+      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+        alert('경기장이 추가되었습니다.');
+
+        setVenueList(prev => [
+          ...prev,
+          {
+            venueId: item.venueId,
+            name: item.venueNm,
+            address: item.address,
+          },
+        ]);
+      } else {
+        alert(resp.resultMessage || '경기장 추가 실패');
+      }
+    } catch (error) {
+      console.error('경기장 추가 실패:', error);
+    }
   };
 
   // 경기장 삭제 버튼 클릭
-  const handleDeleteVenue = item => {
+  const handleDeleteVenue = async item => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
     const requestOptions = {
@@ -159,7 +174,12 @@ const AdminLeagueDetail = () => {
       }),
     };
 
-    ApiFetch.requestFetch('/api/deleteLeagueVenue.do', requestOptions, resp => {
+    try {
+      const resp = await ApiFetch.requestFetch(
+        '/api/deleteLeagueVenue.do',
+        requestOptions,
+      );
+
       if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
         alert('경기장이 삭제되었습니다.');
 
@@ -167,7 +187,9 @@ const AdminLeagueDetail = () => {
       } else {
         alert('삭제 실패');
       }
-    });
+    } catch (error) {
+      console.error('삭제 실패:', error);
+    }
   };
 
   useEffect(() => {

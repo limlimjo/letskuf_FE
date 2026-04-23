@@ -60,98 +60,78 @@ const AdminPlayerEdit = props => {
 
   // 등록/수정 버튼 클릭
   const handleOnUpdate = async () => {
-    console.log('등록 버튼');
     const formData = new FormData();
+
     for (let key in playerInfo) {
-      if (key === 'playerId') continue; // playerId는 루프에서 제외
-      if (key === 'coachId') continue; // coachId는 루프에서 제외
+      if (key === 'playerId' || key === 'coachId') continue;
+
       if (key === 'file') {
         if (playerInfo[key].length > 0) {
-          // 파일이 있을 때
           playerInfo[key].forEach(file => {
             formData.append('file', file);
           });
         } else {
-          // 파일이 없을 때 빈 파일 추가
           formData.append('file', new File([], ''));
         }
       } else if (playerInfo[key] !== null && playerInfo[key] !== undefined) {
-        // 일반 필드들 처리
         formData.append(key, playerInfo[key]);
       }
     }
 
-    // 유효성 검사
     if (formValidatorCoach(formData, playerInfo.typeGbn)) {
-      console.log('formData 출력');
-      console.log(formData);
-
       let apiUrl = '';
+
       if (modeInfo.mode === CODE.MODE_CREATE) {
-        if (playerInfo.typeGbn === '1') {
-          apiUrl = '/api/registerPlayer.do';
-        } else if (playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') {
-          apiUrl = '/api/registerCoach.do';
-        }
-      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+        if (playerInfo.typeGbn === '1') apiUrl = '/api/registerPlayer.do';
+        else apiUrl = '/api/registerCoach.do';
+      } else {
         if (playerInfo.typeGbn === '1') {
           apiUrl = '/api/updatePlayer.do';
           formData.append('playerId', props.playerId);
-        } else if (playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') {
+        } else {
           apiUrl = '/api/updateCoach.do';
           formData.append('coachId', props.coachId);
         }
       }
 
-      const requestOptions = {
-        method: 'POST',
-        body: formData,
-      };
+      try {
+        const resp = await ApiFetch.requestFetch(apiUrl, {
+          method: 'POST',
+          body: formData,
+        });
 
-      // API 호출
-      ApiFetch.requestFetch(apiUrl, requestOptions, resp => {
-        console.log('api 호출');
-        console.log(resp);
-        if (playerInfo.typeGbn === '1') {
-          // 선수 등록/수정
-          //console.log('선수 등록/수정 완료');
-          if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+          if (playerInfo.typeGbn === '1') {
             navigate({ pathname: URL.ADMIN_PLAYER });
           } else {
-            console.error('error');
-          }
-        } else if (playerInfo.typeGbn === '2' || playerInfo.typeGbn === '3') {
-          // 코칭스태프/임원 등록/수정
-          //console.log('코칭스태프/임원 등록/수정 완료');
-          if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
             navigate({ pathname: URL.ADMIN_PLAYER_STAFF });
-          } else {
-            console.error('error');
           }
+        } else {
+          alert('처리 실패');
         }
-      });
+      } catch (e) {
+        console.error(e);
+        alert('서버 오류');
+      }
     }
   };
 
   // 선수 정보 조회 (수정 모드일 때)
   const fetchPlayerInfo = async () => {
     try {
-      console.log('선수 정보 조회 시작');
-      ApiFetch.requestFetch(
+      const resp = await ApiFetch.requestFetch(
         `/api/retrieveUpdatePlayerDetail.do?playerId=${props.playerId}`,
         { method: 'GET' },
-        resp => {
-          if (resp && resp.result) {
-            setPlayerInfo({
-              ...resp.result.player,
-              file: [],
-              originalFileName: resp.result.file?.originalFileName || '', // 파일명만 저장
-              storedFileName: resp.result.file?.storedFileName || '', // 이미지 URL 저장
-            });
-          }
-        },
       );
-      console.log('playerInfo 출력:', playerInfo);
+
+      if (resp && resp.result) {
+        setPlayerInfo({
+          ...resp.result.player,
+          file: [],
+          originalFileName: resp.result.file?.originalFileName || '',
+          storedFileName: resp.result.file?.storedFileName || '',
+        });
+      }
     } catch (e) {
       alert('선수 정보를 불러오지 못했습니다.');
     }
@@ -160,21 +140,19 @@ const AdminPlayerEdit = props => {
   // 코칭스태프/임원 정보 조회 (수정 모드일 때)
   const fetchStaffInfo = async () => {
     try {
-      console.log('코칭스태프/임원 정보 조회 시작');
-      ApiFetch.requestFetch(
+      const resp = await ApiFetch.requestFetch(
         `/api/retrieveUpdateCoachDetail.do?coachId=${props.coachId}`,
         { method: 'GET' },
-        resp => {
-          if (resp && resp.result) {
-            setPlayerInfo({
-              ...resp.result.coach,
-              file: [],
-              originalFileName: resp.result.file?.originalFileName || '', // 파일명만 저장
-              storedFileName: resp.result.file?.storedFileName || '', // 이미지 URL 저장
-            });
-          }
-        },
       );
+
+      if (resp && resp.result) {
+        setPlayerInfo({
+          ...resp.result.coach,
+          file: [],
+          originalFileName: resp.result.file?.originalFileName || '',
+          storedFileName: resp.result.file?.storedFileName || '',
+        });
+      }
     } catch (e) {
       alert('코칭스태프/임원 정보를 불러오지 못했습니다.');
     }
@@ -182,11 +160,12 @@ const AdminPlayerEdit = props => {
 
   // 팀 목록 조회
   useEffect(() => {
-    ApiFetch.requestFetch(
-      '/api/retrieveTeamList.do',
-      { method: 'GET' },
-      resp => {
-        console.log('팀 목록 조회 결과:', resp);
+    const fetchTeams = async () => {
+      try {
+        const resp = await ApiFetch.requestFetch('/api/retrieveTeamList.do', {
+          method: 'GET',
+        });
+
         if (resp && resp.result) {
           setTeamOptions(
             resp.result.resultList.map(team => ({
@@ -195,8 +174,12 @@ const AdminPlayerEdit = props => {
             })),
           );
         }
-      },
-    );
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchTeams();
   }, []);
 
   useEffect(() => {

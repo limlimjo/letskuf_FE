@@ -18,6 +18,7 @@ import AdminMatch from '../pages/admin/match/AdminMatch';
 import AdminVenue from '../pages/admin/venue/AdminVenue';
 import AdminVenueEdit from '../pages/admin/venue/AdminVenueEdit';
 import AdminMatchEdit from '../pages/admin/match/AdminMatchEdit';
+import PATH from '../constants/path';
 
 function AdminTeamEditWithParams(props) {
   const { teamId } = useParams();
@@ -52,55 +53,58 @@ const RootRoutes = () => {
       <div className="flex-1 flex flex-col">
         <Header />
         <Routes>
-          <Route path={URL.ADMIN_TEAM} element={<AdminTeam />} />
-          <Route path={URL.ADMIN_TEAM_DETAIL} element={<AdminTeamDetail />} />
+          <Route path={PATH.ADMIN_TEAM} element={<AdminTeam />} />
+          <Route path={PATH.ADMIN_TEAM_DETAIL} element={<AdminTeamDetail />} />
           <Route
-            path={URL.ADMIN_TEAM_CREATE}
+            path={PATH.ADMIN_TEAM_CREATE}
             element={<AdminTeamEdit mode={CODE.MODE_CREATE} />}
           />
           <Route
-            path={URL.ADMIN_TEAM_MODIFY}
+            path={PATH.ADMIN_TEAM_MODIFY}
             element={<AdminTeamEditWithParams />}
           />
-          <Route path={URL.ADMIN_PLAYER} element={<AdminPlayer />} />
-          <Route path={URL.ADMIN_PLAYER_STAFF} element={<AdminPlayerStaff />} />
+          <Route path={PATH.ADMIN_PLAYER} element={<AdminPlayer />} />
           <Route
-            path={URL.ADMIN_PLAYER_CREATE}
+            path={PATH.ADMIN_PLAYER_STAFF}
+            element={<AdminPlayerStaff />}
+          />
+          <Route
+            path={PATH.ADMIN_PLAYER_CREATE}
             element={<AdminPlayerEdit mode={CODE.MODE_CREATE} />}
           />
           <Route
-            path={URL.ADMIN_PLAYER_MODIFY}
+            path={PATH.ADMIN_PLAYER_MODIFY}
             element={<AdminPlayerEditWithParams />}
           />
           <Route
-            path={URL.ADMIN_PLAYER_STAFF_MODIFY}
+            path={PATH.ADMIN_PLAYER_STAFF_MODIFY}
             element={<AdminPlayerStaffEditWithParams />}
           />
-          <Route path={URL.ADMIN_LEAGUE} element={<AdminLeague />} />
+          <Route path={PATH.ADMIN_LEAGUE} element={<AdminLeague />} />
           <Route
-            path={URL.ADMIN_LEAGUE_DETAIL}
+            path={PATH.ADMIN_LEAGUE_DETAIL}
             element={<AdminLeagueDetail />}
           />
           <Route
-            path={URL.ADMIN_LEAGUE_CREATE}
+            path={PATH.ADMIN_LEAGUE_CREATE}
             element={<AdminLeagueEdit mode={CODE.MODE_CREATE} />}
           />
           <Route
-            path={URL.ADMIN_LEAGUE_MODIFY}
+            path={PATH.ADMIN_LEAGUE_MODIFY}
             element={<AdminLeagueEdit mode={CODE.MODE_MODIFY} />}
           />
-          <Route path={URL.ADMIN_VENUE} element={<AdminVenue />} />
+          <Route path={PATH.ADMIN_VENUE} element={<AdminVenue />} />
           <Route
-            path={URL.ADMIN_VENUE_CREATE}
+            path={PATH.ADMIN_VENUE_CREATE}
             element={<AdminVenueEdit mode={CODE.MODE_CREATE} />}
           />
           <Route
-            path={URL.ADMIN_VENUE_MODIFY}
+            path={PATH.ADMIN_VENUE_MODIFY}
             element={<AdminVenueEditWithParams />}
           />
-          <Route path={URL.ADMIN_MATCH} element={<AdminMatch />} />
+          <Route path={PATH.ADMIN_MATCH} element={<AdminMatch />} />
           <Route
-            path={URL.ADMIN_MATCH_CREATE}
+            path={PATH.ADMIN_MATCH_CREATE}
             element={<AdminMatchEdit mode={CODE.MODE_CREATE} />}
           />
         </Routes>

@@ -95,66 +95,37 @@ const AdminMatchEdit = props => {
     };
 
     if (formValidatorMatch(requestBody, tabType)) {
-      ApiFetch.requestFetch(
-        '/api/registerMatch.do',
-        {
+      try {
+        const resp = await ApiFetch.requestFetch('/api/registerMatch.do', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody),
-        },
-        resp => {
-          if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-            navigate({ pathname: URL.ADMIN_MATCH });
-          }
-        },
-      );
+        });
+
+        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+          navigate({ pathname: URL.ADMIN_MATCH });
+        } else {
+          alert('등록/수정 실패');
+        }
+      } catch (error) {
+        console.error('등록/수정 실패:', error);
+      }
     }
   };
-  // const handleOnUpdate = async () => {
-  //   console.log('등록 버튼');
-  //   const formData = new FormData();
-  //   for (let key in matchInfo) {
-  //     if (matchInfo[key] !== null && matchInfo[key] !== undefined) {
-  //       // 일반 필드들 처리
-  //       formData.append(key, matchInfo[key]);
-  //     }
-  //   }
-  //   formData.append('type', tabType);
-
-  //   // 유효성 검사
-  //   if (formValidatorMatch(formData, tabType)) {
-  //     console.log('formData 출력');
-  //     console.log(formData);
-  //     let apiUrl = '/api/registerMatch.do';
-
-  //     const requestOptions = {
-  //       method: 'POST',
-  //       body: formData,
-  //     };
-
-  //     // API 호출
-  //     ApiFetch.requestFetch(apiUrl, requestOptions, resp => {
-  //       console.log('api 호출');
-  //       console.log(resp);
-  //       if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-  //         navigate({ pathname: URL.ADMIN_MATCH });
-  //       } else {
-  //         console.error('error');
-  //       }
-  //     });
-  //   }
-  // };
 
   // 리그/대회 조회
   useEffect(() => {
-    const params = { type: tabType };
-    ApiFetch.requestFetch(
-      '/api/retrieveLeagueList.do' + ApiFetch.getQueryString(params),
-      { method: 'GET' },
-      resp => {
-        console.log('리그 목록 조회 결과:', resp);
+    const fetchLeagueList = async () => {
+      try {
+        const params = { type: tabType };
+
+        const resp = await ApiFetch.requestFetch(
+          '/api/retrieveLeagueList.do' + ApiFetch.getQueryString(params),
+          { method: 'GET' },
+        );
+
         if (resp && resp.result) {
           setLeagueOptions(
             resp.result.resultList.map(league => ({
@@ -163,10 +134,14 @@ const AdminMatchEdit = props => {
             })),
           );
         }
-      },
-    );
+      } catch (error) {
+        console.error('리그 목록 조회 실패:', error);
+      }
+    };
 
-    // 탭 바뀌면 선택값 초기화
+    fetchLeagueList();
+
+    // 탭 변경 시 경기 정보 초기화
     setMatchInfo(prev => ({
       ...prev,
       leagueId: '',
@@ -184,11 +159,12 @@ const AdminMatchEdit = props => {
 
   // 팀 목록 조회
   useEffect(() => {
-    ApiFetch.requestFetch(
-      '/api/retrieveTeamList.do',
-      { method: 'GET' },
-      resp => {
-        console.log('팀 목록 조회 결과:', resp);
+    const fetchTeamList = async () => {
+      try {
+        const resp = await ApiFetch.requestFetch('/api/retrieveTeamList.do', {
+          method: 'GET',
+        });
+
         if (resp && resp.result) {
           setTeamOptions(
             resp.result.resultList.map(team => ({
@@ -197,8 +173,12 @@ const AdminMatchEdit = props => {
             })),
           );
         }
-      },
-    );
+      } catch (error) {
+        console.error('팀 목록 조회 실패:', error);
+      }
+    };
+
+    fetchTeamList();
   }, []);
 
   useEffect(() => {
@@ -254,7 +234,7 @@ const AdminMatchEdit = props => {
                   leagueOptions.find(opt => opt.value === matchInfo.leagueId) ||
                   null
                 }
-                onChange={selected => {
+                onChange={async selected => {
                   const leagueId = selected ? selected.value : '';
 
                   setMatchInfo(prev => ({
@@ -264,23 +244,27 @@ const AdminMatchEdit = props => {
                     venueId: '',
                   }));
 
-                  if (leagueId) {
-                    ApiFetch.requestFetch(
+                  if (!leagueId) {
+                    setVenueOptions([]);
+                    return;
+                  }
+
+                  try {
+                    const resp = await ApiFetch.requestFetch(
                       `/api/retrieveLeagueVenue.do?leagueId=${leagueId}`,
                       { method: 'GET' },
-                      resp => {
-                        if (resp && resp.result) {
-                          setVenueOptions(
-                            resp.result.venue.map(v => ({
-                              value: v.venueId,
-                              label: v.name,
-                            })),
-                          );
-                        }
-                      },
                     );
-                  } else {
-                    setVenueOptions([]);
+
+                    if (resp && resp.result) {
+                      setVenueOptions(
+                        resp.result.venue.map(v => ({
+                          value: v.venueId,
+                          label: v.name,
+                        })),
+                      );
+                    }
+                  } catch (error) {
+                    console.error('경기장 목록 조회 실패:', error);
                   }
                 }}
                 placeholder="리그/대회명을 검색하세요"

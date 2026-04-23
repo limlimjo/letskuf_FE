@@ -72,15 +72,20 @@ const AdminLeagueEdit = props => {
       };
 
       // API 호출
-      ApiFetch.requestFetch(apiUrl, requestOptions, resp => {
+      try {
+        const resp = await ApiFetch.requestFetch(apiUrl, requestOptions);
+
         console.log('api 호출');
         console.log(resp);
+
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           navigate({ pathname: URL.ADMIN_LEAGUE });
         } else {
           console.error('error');
         }
-      });
+      } catch (error) {
+        console.error('API 호출 실패:', error);
+      }
     }
   };
 

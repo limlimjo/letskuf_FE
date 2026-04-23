@@ -1,4 +1,7 @@
 const URL = {
+  //ADMIN-LOGIN
+  ADMIN_LOGIN: '/admin/login',
+
   //ADMIN-TEAM
   ADMIN_TEAM: '/admin/team',
   ADMIN_TEAM_DETAIL: '/admin/team/:teamId',

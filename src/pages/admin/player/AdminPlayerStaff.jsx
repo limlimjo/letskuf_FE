@@ -17,18 +17,15 @@ const AdminPlayerStaff = () => {
   const [listTag, setListTag] = useState([]);
 
   const retrieveList = useCallback(
-    srchCond => {
-      const retrieveListURL =
-        '/api/retrieveCoach.do' + ApiFetch.getQueryString(srchCond);
+    async srchCond => {
+      try {
+        const retrieveListURL =
+          '/api/retrieveCoach.do' + ApiFetch.getQueryString(srchCond);
 
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
+        const resp = await ApiFetch.requestFetch(retrieveListURL, {
+          method: 'GET',
+        });
 
-      ApiFetch.requestFetch(retrieveListURL, requestOptions, resp => {
         setPaginationInfo(resp.result.paginationInfo);
 
         let mutListTag = [];
@@ -40,15 +37,10 @@ const AdminPlayerStaff = () => {
               className="border-b border-gray-200 hover:bg-gray-50"
             >
               <td className="px-6 py-3">{idx + 1}</td>
-
               <td className="px-6 py-3">{item.name}</td>
-
               <td className="px-6 py-3">{item.teamNm}</td>
-
               <td className="px-6 py-3">{item.birthDate}</td>
-
               <td className="px-6 py-3">{item.title}</td>
-
               <td className="px-6 py-3">
                 <Link
                   to={`/admin/player/staff/${item.coachId}/modify`}
@@ -79,32 +71,36 @@ const AdminPlayerStaff = () => {
         }
 
         setListTag(mutListTag);
-      });
+      } catch (e) {
+        console.error(e);
+        alert('목록 조회 실패');
+      }
     },
     [searchCondition],
   );
 
   const handleOnDelete = useCallback(
-    coachId => {
+    async coachId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
-      const deleteUrl = `/api/deleteCoach.do?coachId=${coachId}`;
+      try {
+        const resp = await ApiFetch.requestFetch(
+          `/api/deleteCoach.do?coachId=${coachId}`,
+          {
+            method: 'POST',
+          },
+        );
 
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
-
-      ApiFetch.requestFetch(deleteUrl, requestOptions, resp => {
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
           alert('삭제되었습니다.');
           retrieveList(searchCondition);
         } else {
           alert('삭제에 실패했습니다.');
         }
-      });
+      } catch (e) {
+        console.error(e);
+        alert('서버 오류');
+      }
     },
     [retrieveList, searchCondition],
   );
