@@ -1,7 +1,6 @@
 // route 모아놓는 곳
 import { Route, Routes } from 'react-router-dom';
 import Header from '../components/Header';
-import URL from '../constants/url';
 import CODE from '../constants/code';
 import AdminTeam from '../pages/admin/team/AdminTeam';
 import LeftMenuAdmin from '../components/leftmenu/LeftMenuAdmin';
@@ -43,6 +42,13 @@ function AdminVenueEditWithParams(props) {
   const { venueId } = useParams();
   return (
     <AdminVenueEdit mode={CODE.MODE_MODIFY} venueId={venueId} {...props} />
+  );
+}
+
+function AdminMatchEditWithParams(props) {
+  const { matchId } = useParams();
+  return (
+    <AdminMatchEdit mode={CODE.MODE_MODIFY} matchId={matchId} {...props} />
   );
 }
 
@@ -106,6 +112,10 @@ const RootRoutes = () => {
           <Route
             path={PATH.ADMIN_MATCH_CREATE}
             element={<AdminMatchEdit mode={CODE.MODE_CREATE} />}
+          />
+          <Route
+            path={PATH.ADMIN_MATCH_MODIFY}
+            element={<AdminMatchEditWithParams />}
           />
         </Routes>
       </div>

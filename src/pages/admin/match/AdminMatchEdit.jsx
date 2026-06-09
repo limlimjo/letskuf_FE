@@ -141,20 +141,22 @@ const AdminMatchEdit = props => {
 
     fetchLeagueList();
 
-    // 탭 변경 시 경기 정보 초기화
-    setMatchInfo(prev => ({
-      ...prev,
-      leagueId: '',
-      name: '',
-      venueId: '',
-      homeTeamId: '',
-      homeTeamNm: '',
-      awayTeamId: '',
-      awayTeamNm: '',
-    }));
+    if (props.mode === CODE.MODE_CREATE) {
+      // 탭 변경 시 경기 정보 초기화
+      setMatchInfo(prev => ({
+        ...prev,
+        leagueId: '',
+        name: '',
+        venueId: '',
+        homeTeamId: '',
+        homeTeamNm: '',
+        awayTeamId: '',
+        awayTeamNm: '',
+      }));
 
-    // 장소 옵션 초기화
-    setVenueOptions([]);
+      // 장소 옵션 초기화
+      setVenueOptions([]);
+    }
   }, [tabType]);
 
   // 팀 목록 조회
@@ -181,9 +183,60 @@ const AdminMatchEdit = props => {
     fetchTeamList();
   }, []);
 
+  // 경기장 조회
+  const fetchVenueList = async leagueId => {
+    try {
+      const resp = await ApiFetch.requestFetch(
+        `/api/retrieveLeagueVenue.do?leagueId=${leagueId}`,
+        { method: 'GET' },
+      );
+
+      if (resp && resp.result) {
+        setVenueOptions(
+          resp.result.venue.map(v => ({
+            value: v.venueId,
+            label: v.name,
+          })),
+        );
+      }
+    } catch (error) {
+      console.error('경기장 목록 조회 실패:', error);
+    }
+  };
+
+  // 경기 정보 조회 (수정 모드일 때)
+  const fetchMatchInfo = async () => {
+    try {
+      const resp = await ApiFetch.requestFetch(
+        `/api/retrieveMatchDetail.do?matchId=${props.matchId}`,
+        {
+          method: 'GET',
+        },
+      );
+      console.log('경기 정보 조회 결과:', resp.result);
+      if (resp && resp.result) {
+        const match = resp.result.match;
+
+        setTabType(match.type);
+
+        setMatchInfo({
+          ...match,
+          uniformList: resp.result.matchUniform,
+        });
+
+        await fetchVenueList(match.leagueId);
+      }
+    } catch (error) {
+      console.error('경기 정보 조회 실패:', error);
+    }
+  };
+
   useEffect(() => {
     initMode();
-  }, []);
+    if (props.mode === CODE.MODE_MODIFY && props.matchId) {
+      fetchMatchInfo();
+    }
+  }, [props.mode, props.matchId]);
 
   return (
     <main className="bg-gray-200 min-h-screen">
@@ -194,33 +247,34 @@ const AdminMatchEdit = props => {
 
         <div className="mt-8">
           {/* 탭 */}
-          <div className="mt-8 flex gap-4 w-[400px]">
-            <Button
-              className={`flex-1 py-2 rounded ${
-                tabType === 'LEAGUE'
-                  ? 'bg-black text-white font-bold'
-                  : 'bg-gray-100 text-black'
-              }`}
-              onClick={() => {
-                setTabType('LEAGUE');
-              }}
-            >
-              리그
-            </Button>
-
-            <Button
-              className={`flex-1 py-2 rounded ${
-                tabType === 'TOURNAMENT'
-                  ? 'bg-black text-white font-bold'
-                  : 'bg-gray-100 text-black'
-              }`}
-              onClick={() => {
-                setTabType('TOURNAMENT');
-              }}
-            >
-              대회
-            </Button>
-          </div>
+          {props.mode === CODE.MODE_CREATE && (
+            <div className="mt-8 flex gap-4 w-[400px]">
+              <Button
+                className={`flex-1 py-2 rounded ${
+                  tabType === 'LEAGUE'
+                    ? 'bg-black text-white font-bold'
+                    : 'bg-gray-100 text-black'
+                }`}
+                onClick={() => {
+                  setTabType('LEAGUE');
+                }}
+              >
+                리그
+              </Button>
+              <Button
+                className={`flex-1 py-2 rounded ${
+                  tabType === 'TOURNAMENT'
+                    ? 'bg-black text-white font-bold'
+                    : 'bg-gray-100 text-black'
+                }`}
+                onClick={() => {
+                  setTabType('TOURNAMENT');
+                }}
+              >
+                대회
+              </Button>
+            </div>
+          )}
           <div className="flex flex-col mb-6 gap-6 bg-white p-6 mt-4 rounded-lg shadow">
             {/* 리그명 */}
             <div className="flex items-center">
@@ -231,8 +285,9 @@ const AdminMatchEdit = props => {
                 className="w-64"
                 options={leagueOptions}
                 value={
-                  leagueOptions.find(opt => opt.value === matchInfo.leagueId) ||
-                  null
+                  leagueOptions.find(
+                    opt => Number(opt.value) === Number(matchInfo.leagueId),
+                  ) || null
                 }
                 onChange={async selected => {
                   const leagueId = selected ? selected.value : '';
@@ -363,6 +418,7 @@ const AdminMatchEdit = props => {
                 <input
                   className="w-16 h-8 px-2 bg-gray-200"
                   type="text"
+                  value={matchInfo.uniformList?.[0]?.topColor || ''}
                   onChange={e =>
                     handleUniformChange(0, 'topColor', e.target.value)
                   }
@@ -371,6 +427,7 @@ const AdminMatchEdit = props => {
                 <input
                   className="w-16 h-8 px-2 bg-gray-200"
                   type="text"
+                  value={matchInfo.uniformList?.[0]?.bottomColor || ''}
                   onChange={e =>
                     handleUniformChange(0, 'bottomColor', e.target.value)
                   }
@@ -379,6 +436,7 @@ const AdminMatchEdit = props => {
                 <input
                   className="w-16 h-8 px-2 bg-gray-200"
                   type="text"
+                  value={matchInfo.uniformList?.[0]?.socksColor || ''}
                   onChange={e =>
                     handleUniformChange(0, 'socksColor', e.target.value)
                   }
@@ -416,6 +474,7 @@ const AdminMatchEdit = props => {
                 <input
                   className="w-16 h-8 px-2 bg-gray-200"
                   type="text"
+                  value={matchInfo.uniformList?.[1]?.topColor || ''}
                   onChange={e =>
                     handleUniformChange(1, 'topColor', e.target.value)
                   }
@@ -424,6 +483,7 @@ const AdminMatchEdit = props => {
                 <input
                   className="w-16 h-8 px-2 bg-gray-200"
                   type="text"
+                  value={matchInfo.uniformList?.[1]?.bottomColor || ''}
                   onChange={e =>
                     handleUniformChange(1, 'bottomColor', e.target.value)
                   }
@@ -432,6 +492,7 @@ const AdminMatchEdit = props => {
                 <input
                   className="w-16 h-8 px-2 bg-gray-200"
                   type="text"
+                  value={matchInfo.uniformList?.[1]?.socksColor || ''}
                   onChange={e =>
                     handleUniformChange(1, 'socksColor', e.target.value)
                   }
