@@ -30,7 +30,7 @@ const PATH = {
   ADMIN_MATCH_DETAIL: '/match/:matchId',
   ADMIN_MATCH_CREATE: '/match/create',
   ADMIN_MATCH_MODIFY: '/match/:matchId/modify',
-  ADMIN_MATCH_DETAIL_LIVE: '/match/:matchId/live',
+  ADMIN_MATCH_LIVE: '/match/:matchId/live',
 };
 
 export default PATH;

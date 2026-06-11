@@ -95,6 +95,12 @@ const LeftMenuAdmin = () => {
           >
             경기 등록
           </NavLink>
+          <NavLink
+            to={URL.ADMIN_MATCH_CREATE}
+            className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
+          >
+            경기 결과 조회
+          </NavLink>
         </div>
       </nav>
     </aside>

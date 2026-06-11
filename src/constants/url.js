@@ -33,7 +33,9 @@ const URL = {
   ADMIN_MATCH_DETAIL: '/admin/match/:matchId',
   ADMIN_MATCH_CREATE: '/admin/match/create',
   ADMIN_MATCH_MODIFY: '/admin/match/:matchId/modify',
-  ADMIN_MATCH_DETAIL_LIVE: '/admin/match/:matchId/live',
+  ADMIN_MATCH_LIVE: '/admin/match/:matchId/live',
+
+  getAdminMatchLive: matchId => `/admin/match/${matchId}/live`,
 };
 
 export default URL;

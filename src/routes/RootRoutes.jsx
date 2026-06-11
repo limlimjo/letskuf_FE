@@ -18,6 +18,7 @@ import AdminVenue from '../pages/admin/venue/AdminVenue';
 import AdminVenueEdit from '../pages/admin/venue/AdminVenueEdit';
 import AdminMatchEdit from '../pages/admin/match/AdminMatchEdit';
 import PATH from '../constants/path';
+import AdminMatchLiveEdit from '../pages/admin/match/AdminMatchLiveEdit';
 
 function AdminTeamEditWithParams(props) {
   const { teamId } = useParams();
@@ -50,6 +51,11 @@ function AdminMatchEditWithParams(props) {
   return (
     <AdminMatchEdit mode={CODE.MODE_MODIFY} matchId={matchId} {...props} />
   );
+}
+
+function AdminMatchLiveEditWithParams(props) {
+  const { matchId } = useParams();
+  return <AdminMatchLiveEdit matchId={matchId} {...props} />;
 }
 
 const RootRoutes = () => {
@@ -116,6 +122,10 @@ const RootRoutes = () => {
           <Route
             path={PATH.ADMIN_MATCH_MODIFY}
             element={<AdminMatchEditWithParams />}
+          />
+          <Route
+            path={PATH.ADMIN_MATCH_LIVE}
+            element={<AdminMatchLiveEditWithParams />}
           />
         </Routes>
       </div>

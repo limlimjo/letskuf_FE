@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as ApiFetch from '../../../api/apiFetch';
 import Pagination from '../../../components/Pagination';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import CODE from '../../../constants/code';
+import URL from '../../../constants/url.js';
 
 const AdminMatch = () => {
+  const navigate = useNavigate();
   const location = useLocation();
 
   const [searchCondition, setSearchCondition] = useState(
@@ -52,30 +54,53 @@ const AdminMatch = () => {
             <td className="px-6 py-3">{item.venueNm}</td>
 
             <td className="px-6 py-3 whitespace-nowrap" colSpan={3}>
-              <div className="flex flex-col gap-2">
-                <Link
-                  to={`/admin/match/${item.matchId}/live`}
-                  className="w-full bg-blue-100 text-blue-800 px-3 py-1 text-xs rounded font-semibold hover:bg-blue-200 transition"
-                >
-                  실시간
-                </Link>
-
-                <div className="flex gap-2 w-full">
-                  <Link
-                    to={`/admin/match/${item.matchId}/modify`}
-                    className="w-full bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 transition"
-                  >
-                    수정
-                  </Link>
-
+              {item.status === 'SCHEDULED' && (
+                <div className="flex flex-col gap-2">
                   <button
-                    className="w-full bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200 transition"
-                    onClick={() => handleOnDelete(item.matchId)}
+                    className="w-full bg-blue-100 text-blue-800 px-3 py-1 text-xs rounded font-semibold hover:bg-blue-200 transition"
+                    onClick={() => handleStartMatch(item.matchId)}
                   >
-                    삭제
+                    실시간 시작
                   </button>
+                  <div className="flex gap-2 w-full">
+                    <Link
+                      to={`/admin/match/${item.matchId}/modify`}
+                      className="w-full bg-green-100 text-green-800 px-3 py-1 text-xs rounded font-semibold hover:bg-green-200 transition"
+                    >
+                      수정
+                    </Link>
+                    <button
+                      className="w-full bg-red-100 text-red-800 px-3 py-1 text-xs rounded font-semibold hover:bg-red-200 transition"
+                      onClick={() => handleOnDelete(item.matchId)}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                  <div className="flex gap-2 w-full">
+                    <button className="w-full bg-yellow-100 text-yellow-800 px-3 py-1 text-xs rounded font-semibold hover:bg-yellow-200 transition">
+                      취소
+                    </button>
+                    <button className="w-full bg-gray-100 text-gray-800 px-3 py-1 text-xs rounded font-semibold hover:bg-gray-200 transition">
+                      연기
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
+              {item.status === 'LIVE' && (
+                <Link className="w-full bg-blue-100 text-blue-800 px-3 py-1 text-xs rounded font-semibold hover:bg-blue-200 transition">
+                  결과 보기
+                </Link>
+              )}
+              {item.status === 'CANCELLED' && (
+                <button className="w-full bg-yellow-100 text-yellow-800 px-3 py-1 text-xs rounded font-semibold hover:bg-yellow-200 transition">
+                  취소
+                </button>
+              )}
+              {item.status === 'POSTPONED' && (
+                <button className="w-full bg-gray-100 text-gray-800 px-3 py-1 text-xs rounded font-semibold hover:bg-gray-200 transition">
+                  연기
+                </button>
+              )}
             </td>
           </tr>,
         );
@@ -97,6 +122,37 @@ const AdminMatch = () => {
     }
   }, []);
 
+  // 실시간 경기 기록 시작 버튼 클릭 핸들러
+  const handleStartMatch = async matchId => {
+    if (!window.confirm('실시간 경기 기록을 시작하시겠습니까?')) return;
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({ matchId }),
+    };
+
+    try {
+      const resp = await ApiFetch.requestFetch(
+        '/api/updateStartMatch.do',
+        requestOptions,
+      );
+
+      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+        // 실시간 경기 기록 페이지로 이동
+        navigate(URL.getAdminMatchLive(matchId));
+      } else {
+        alert('실시간 경기 기록 시작 실패');
+      }
+    } catch (error) {
+      console.error('실시간 경기 기록 시작 실패:', error);
+      alert('실시간 경기 기록 시작 중 오류 발생');
+    }
+  };
+
+  // 삭제 버튼 클릭 핸들러
   const handleOnDelete = useCallback(
     async matchId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
