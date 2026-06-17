@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as ApiFetch from '../../../api/apiFetch';
 import useAuthStore from '../../../store/useAuthStore';
+import URL from '../../../constants/url';
 
 const AdminLogin = () => {
   const { setIsLogin, setUser } = useAuthStore();
@@ -27,7 +28,7 @@ const AdminLogin = () => {
       setUser(user.result.username);
 
       alert('로그인 성공');
-      navigate('/admin/team');
+      navigate({ pathname: URL.ADMIN_TEAM });
     } catch (e) {
       alert('로그인 실패');
     }

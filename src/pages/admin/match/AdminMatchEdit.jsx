@@ -84,7 +84,7 @@ const AdminMatchEdit = props => {
 
   // 취소 버튼 클릭
   const handleOnCancel = () => {
-    navigate({ pathname: URL.ADMIN_MATCH });
+    navigate({ pathname: URL.getAdminMatchDetail(props.matchId) });
   };
 
   // 등록/수정 버튼 클릭
@@ -95,17 +95,26 @@ const AdminMatchEdit = props => {
     };
 
     if (formValidatorMatch(requestBody, tabType)) {
+      let apiUrl = '';
+      if (modeInfo.mode === CODE.MODE_CREATE) {
+        apiUrl = '/api/registerMatch.do';
+      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+        apiUrl = '/api/updateMatch.do';
+      }
+
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      };
+
       try {
-        const resp = await ApiFetch.requestFetch('/api/registerMatch.do', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
+        const resp = await ApiFetch.requestFetch(apiUrl, requestOptions);
 
         if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          navigate({ pathname: URL.ADMIN_MATCH });
+          navigate({ pathname: URL.getAdminMatchDetail(props.matchId) });
         } else {
           alert('등록/수정 실패');
         }

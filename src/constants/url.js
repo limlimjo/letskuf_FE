@@ -35,6 +35,7 @@ const URL = {
   ADMIN_MATCH_MODIFY: '/admin/match/:matchId/modify',
   ADMIN_MATCH_LIVE: '/admin/match/:matchId/live',
 
+  getAdminMatchDetail: matchId => `/admin/match/${matchId}`,
   getAdminMatchLive: matchId => `/admin/match/${matchId}/live`,
 };
 

@@ -8,7 +8,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate(URL.ADMIN_LOGIN);
+    navigate({ pathname: URL.ADMIN_LOGIN });
   };
 
   return (
