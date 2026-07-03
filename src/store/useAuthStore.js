@@ -10,7 +10,7 @@ const useAuthStore = create(set => ({
 
   checkLogin: async () => {
     try {
-      const res = await ApiFetch.requestFetch('/api/me');
+      const res = await ApiFetch.requestFetch('/api/me', {}, { handle401: false });
       set({ isLogin: true, user: res.result.username });
     } catch (e) {
       set({ isLogin: false, user: null });

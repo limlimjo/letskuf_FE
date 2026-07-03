@@ -8,7 +8,7 @@ export function getQueryString(params) {
 }
 
 // Promise 기반 requestFetch
-export async function requestFetch(url, requestOptions = {}) {
+export async function requestFetch(url, requestOptions = {}, { handle401 = true } = {}) {
   console.groupCollapsed('requestFetch');
   console.log('URL:', SERVER_URL + url);
 
@@ -22,8 +22,12 @@ export async function requestFetch(url, requestOptions = {}) {
 
     // 401 (인증 실패) 처리
     if (response.status === 401) {
-      console.warn('인증 만료 → 로그인 페이지로 이동');
-      //window.location.href = '/admin/login';
+      if (handle401) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        sessionStorage.clear(); // 세션 스토리지 초기화
+        localStorage.clear(); // 로컬 스토리지 초기화
+        window.location.replace("/admin/login"); // 로그인 페이지로 이동
+      }
       throw new Error('Unauthorized');
     }
 
