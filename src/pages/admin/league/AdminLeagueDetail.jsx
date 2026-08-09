@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as ApiFetch from '../../../api/apiFetch';
-import Button from '../../../components/Button';
+import Button from '../../../components/common/Button';
 import CODE from '../../../constants/code';
 import { useParams } from 'react-router-dom';
-import Pagination from '../../../components/Pagination';
+import Pagination from '../../../components/common/Pagination';
 
 const AdminLeagueDetail = () => {
   const { leagueId } = useParams();

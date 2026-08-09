@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as ApiFetch from '../../../api/apiFetch';
-import Pagination from '../../../components/Pagination';
+import Pagination from '../../../components/common/Pagination';
 import { Link, useLocation } from 'react-router-dom';
-import Button from '../../../components/Button';
+import Button from '../../../components/common/Button';
 import CODE from '../../../constants/code';
 
 const AdminLeague = () => {

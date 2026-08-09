@@ -1,9 +1,10 @@
 // route 모아놓는 곳
 import { Route, Routes } from 'react-router-dom';
-import Header from '../components/Header';
+
 import CODE from '../constants/code';
+import Header from '../components/common/Header';
 import AdminTeam from '../pages/admin/team/AdminTeam';
-import LeftMenuAdmin from '../components/leftmenu/LeftMenuAdmin';
+import LeftMenuAdmin from '../components/common/leftmenu/LeftMenuAdmin';
 import AdminTeamDetail from '../pages/admin/team/AdminTeamDetail';
 import AdminTeamEdit from '../pages/admin/team/AdminTeamEdit';
 import AdminPlayer from '../pages/admin/player/AdminPlayer';
@@ -20,6 +21,9 @@ import AdminMatchEdit from '../pages/admin/match/AdminMatchEdit';
 import PATH from '../constants/path';
 import AdminMatchLiveEdit from '../pages/admin/match/AdminMatchLiveEdit';
 import AdminMatchDetail from '../pages/admin/match/AdminMatchDetail';
+import AdminMatchLineup from '../pages/admin/match/AdminMatchLineup';
+import AdminMatchResult from '../pages/admin/match/AdminMatchResult';
+
 
 function AdminTeamEditWithParams(props) {
   const { teamId } = useParams();
@@ -57,6 +61,10 @@ function AdminMatchEditWithParams(props) {
 function AdminMatchDetailWithParams(props) {
   const { matchId } = useParams();
   return <AdminMatchDetail matchId={matchId} {...props} />;
+}
+function AdminMatchLineupWithParams(props) {
+  const { matchId } = useParams();
+  return <AdminMatchLineup matchId={matchId} {...props} />;
 }
 
 function AdminMatchLiveEditWithParams(props) {
@@ -134,9 +142,18 @@ const RootRoutes = () => {
             element={<AdminMatchDetailWithParams />}
           />
           <Route
+            path={PATH.ADMIN_MATCH_LINEUP}
+            element={<AdminMatchLineupWithParams readOnly={false} />}
+          />
+          <Route
+            path={PATH.ADMIN_MATCH_LINEUP_READONLY}
+            element={<AdminMatchLineupWithParams readOnly={true} />}
+          />
+          <Route
             path={PATH.ADMIN_MATCH_LIVE}
             element={<AdminMatchLiveEditWithParams />}
           />
+          <Route path={PATH.ADMIN_MATCH_RESULT} element={<AdminMatchResult />} />
         </Routes>
       </div>
     </>

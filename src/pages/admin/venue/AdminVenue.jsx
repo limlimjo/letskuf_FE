@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as ApiFetch from '../../../api/apiFetch';
-import Pagination from '../../../components/Pagination';
+import Pagination from '../../../components/common/Pagination';
 import { Link, useLocation } from 'react-router-dom';
 import CODE from '../../../constants/code';
 

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../store/useAuthStore';
-import URL from '../constants/url';
+import useAuthStore from '../../store/useAuthStore';
+import URL from '../../constants/url';
 
 const Header = () => {
   const { isLogin, user, logout } = useAuthStore();

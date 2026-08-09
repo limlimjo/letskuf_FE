@@ -1,12 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as ApiFetch from '../../../api/apiFetch';
-import Pagination from '../../../components/Pagination';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import CODE from '../../../constants/code';
-import URL from '../../../constants/url.js';
+import Pagination from '../../../components/common/Pagination.jsx';
+import { Link, useLocation } from 'react-router-dom';
 
 const AdminMatch = () => {
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [searchCondition, setSearchCondition] = useState(
@@ -80,67 +77,6 @@ const AdminMatch = () => {
       console.error('경기 목록 조회 실패:', error);
     }
   }, []);
-
-  // 실시간 경기 기록 시작 버튼 클릭 핸들러
-  const handleStartMatch = async matchId => {
-    if (!window.confirm('실시간 경기 기록을 시작하시겠습니까?')) return;
-
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({ matchId }),
-    };
-
-    try {
-      const resp = await ApiFetch.requestFetch(
-        '/api/updateStartMatch.do',
-        requestOptions,
-      );
-
-      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-        // 실시간 경기 기록 페이지로 이동
-        navigate(URL.getAdminMatchLive(matchId));
-      } else {
-        alert('실시간 경기 기록 시작 실패');
-      }
-    } catch (error) {
-      console.error('실시간 경기 기록 시작 실패:', error);
-      alert('실시간 경기 기록 시작 중 오류 발생');
-    }
-  };
-
-  // 삭제 버튼 클릭 핸들러
-  const handleOnDelete = useCallback(
-    async matchId => {
-      if (!window.confirm('정말 삭제하시겠습니까?')) return;
-
-      const deleteUrl = `/api/deleteMatch.do?matchId=${matchId}`;
-
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-      };
-
-      try {
-        const resp = await ApiFetch.requestFetch(deleteUrl, requestOptions);
-
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          alert('삭제되었습니다.');
-          retrieveList(searchCondition);
-        } else {
-          alert('삭제 실패');
-        }
-      } catch (error) {
-        console.error('삭제 실패:', error);
-        alert('삭제 중 오류 발생');
-      }
-    },
-    [retrieveList, searchCondition],
-  );
 
   useEffect(() => {
     retrieveList(searchCondition);

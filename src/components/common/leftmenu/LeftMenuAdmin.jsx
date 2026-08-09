@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
-import URL from '../../constants/url';
+import URL from '../../../constants/url';
 
 const LeftMenuAdmin = () => {
   return (
@@ -96,7 +96,7 @@ const LeftMenuAdmin = () => {
             경기 등록
           </NavLink>
           <NavLink
-            to={URL.ADMIN_MATCH_CREATE}
+            to={URL.ADMIN_MATCH_RESULT}
             className="py-1.5 px-4 hover:bg-gray-700 rounded transition-colors duration-200"
           >
             경기 결과 조회

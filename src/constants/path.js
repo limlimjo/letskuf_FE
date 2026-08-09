@@ -30,7 +30,10 @@ const PATH = {
   ADMIN_MATCH_DETAIL: '/match/:matchId',
   ADMIN_MATCH_CREATE: '/match/create',
   ADMIN_MATCH_MODIFY: '/match/:matchId/modify',
+  ADMIN_MATCH_LINEUP: '/match/:matchId/lineup',
+  ADMIN_MATCH_LINEUP_READONLY: '/match/:matchId/lineup/view',
   ADMIN_MATCH_LIVE: '/match/:matchId/live',
+  ADMIN_MATCH_RESULT: '/match/result',
 };
 
 export default PATH;
