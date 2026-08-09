@@ -10,8 +10,7 @@ import formValidatorCoach from '../../../utils/formValidatorCoach';
 const AdminPlayerEdit = props => {
   const [modeInfo, setModeInfo] = useState({ mode: props.mode });
   const [teamOptions, setTeamOptions] = useState([]);
-  const [playerInfo, setPlayerInfo] = useState({ file: [] });
-  const [preview, setPreview] = useState(null);
+  const [playerInfo, setPlayerInfo] = useState({});
 
   const navigate = useNavigate();
 
@@ -35,18 +34,6 @@ const AdminPlayerEdit = props => {
     }
   };
 
-  // 파일 선택 추가
-  const handleFileChange = e => {
-    const file = e.target.files[0];
-    setPlayerInfo(prev => ({
-      ...prev,
-      file: file ? [file] : [],
-    }));
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
   // 취소 버튼 클릭
   const handleOnCancel = () => {
     if (props.playerId) {
@@ -65,15 +52,7 @@ const AdminPlayerEdit = props => {
     for (let key in playerInfo) {
       if (key === 'playerId' || key === 'coachId') continue;
 
-      if (key === 'file') {
-        if (playerInfo[key].length > 0) {
-          playerInfo[key].forEach(file => {
-            formData.append('file', file);
-          });
-        } else {
-          formData.append('file', new File([], ''));
-        }
-      } else if (playerInfo[key] !== null && playerInfo[key] !== undefined) {
+      if (playerInfo[key] !== null && playerInfo[key] !== undefined) {
         formData.append(key, playerInfo[key]);
       }
     }
@@ -127,9 +106,6 @@ const AdminPlayerEdit = props => {
       if (resp && resp.result) {
         setPlayerInfo({
           ...resp.result.player,
-          file: [],
-          originalFileName: resp.result.file?.originalFileName || '',
-          storedFileName: resp.result.file?.storedFileName || '',
         });
       }
     } catch (e) {
@@ -148,9 +124,6 @@ const AdminPlayerEdit = props => {
       if (resp && resp.result) {
         setPlayerInfo({
           ...resp.result.coach,
-          file: [],
-          originalFileName: resp.result.file?.originalFileName || '',
-          storedFileName: resp.result.file?.storedFileName || '',
         });
       }
     } catch (e) {
@@ -502,51 +475,6 @@ const AdminPlayerEdit = props => {
                     </td>
                   </tr>
                 )}
-
-                {/* 사진 */}
-                <tr>
-                  <th className="w-40 px-6 py-3 bg-gray-100 text-center text-gray-500">
-                    사진 첨부
-                  </th>
-
-                  <td colSpan={3} className="px-6 py-4">
-                    <label className="cursor-pointer bg-gray-100 px-4 py-2 rounded border border-gray-300 hover:bg-gray-200">
-                      파일 선택
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </label>
-
-                    {playerInfo.file?.length > 0 ? (
-                      <div className="mt-3">
-                        <img
-                          src={preview}
-                          alt="preview"
-                          className="w-32 h-32 object-cover rounded border"
-                        />
-
-                        <p className="text-sm text-gray-600 mt-1">
-                          {playerInfo.file[0].name}
-                        </p>
-                      </div>
-                    ) : playerInfo.storedFileName ? (
-                      <div className="mt-3">
-                        <img
-                          src={playerInfo.storedFileName}
-                          alt={playerInfo.originalFileName}
-                          className="w-32 h-32 object-cover rounded border"
-                        />
-
-                        <p className="text-xs text-gray-500">
-                          현재 등록된 이미지
-                        </p>
-                      </div>
-                    ) : null}
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
