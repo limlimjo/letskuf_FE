@@ -29,7 +29,10 @@ const AdminTeamDetail = () => {
       console.log('api 호출결과');
       console.log(resp);
 
-      setTeamInfo(resp.result.team);
+      setTeamInfo({ 
+                  ...resp.result.team, 
+                  storedFilePath: resp.result.teamFile ? resp.result.teamFile.storedFileName : '', 
+                });
       setCoachInfo(resp.result.coaches || []);
       setPlayerInfo(resp.result.players || []);
     } catch (e) {

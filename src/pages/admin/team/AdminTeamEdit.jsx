@@ -96,16 +96,18 @@ const AdminTeamEdit = props => {
 
       for (let key in teamInfo) {
         if (key === 'teamId') continue;
-
+        
+        // 파일
         if (key === 'teamFile') {
-          if (teamInfo[key].length > 0) {
-            teamInfo[key].forEach(file => {
-              formData.append('teamFile', file);
-            });
-          } else {
-            formData.append('teamFile', new File([], ''));
+          // 새 파일이 선택된 경우에만 전송
+          if (teamInfo[key]?.length > 0) { 
+            formData.append('teamFile', teamInfo[key][0]); 
           }
-        } else if (teamInfo[key] !== null && teamInfo[key] !== undefined) {
+
+          continue;
+        } 
+        // 일반 데이터
+        if (teamInfo[key] !== null && teamInfo[key] !== undefined) {
           formData.append(key, teamInfo[key]);
         }
       }
