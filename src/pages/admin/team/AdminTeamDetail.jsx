@@ -66,7 +66,7 @@ const AdminTeamDetail = () => {
             <div>
               <h2 className="text-gray-700 text-2xl font-bold">지도자</h2>
               <div className="mt-4 shadow rounded-lg overflow-hidden border-b border-gray-200">
-                <table className="w-[1280px]">
+                <table className="w-full">
                   <thead>
                     <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                       <th className="px-4 py-3 font-medium">이름</th>
@@ -83,7 +83,7 @@ const AdminTeamDetail = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={2}>데이터 없음</td>
+                        <td colSpan={2} className="py-3.5 text-center">데이터 없음</td>
                       </tr>
                     )}
                   </tbody>
@@ -93,7 +93,7 @@ const AdminTeamDetail = () => {
             <div className="mt-10">
               <h2 className="text-gray-700 text-2xl font-bold">임원</h2>
               <div className="mt-4 shadow rounded-lg overflow-hidden border-b border-gray-200">
-                <table className="w-[1280px]">
+                <table className="w-full">
                   <thead>
                     <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                       <th className="px-6 py-3 font-medium">이름</th>
@@ -110,7 +110,7 @@ const AdminTeamDetail = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={2}>데이터 없음</td>
+                        <td colSpan={2} className="py-3.5 text-center">데이터 없음</td>
                       </tr>
                     )}
                   </tbody>
@@ -121,7 +121,7 @@ const AdminTeamDetail = () => {
           <div className="w-3/5">
             <h2 className="text-gray-700 text-2xl font-bold">선수</h2>
             <div className="mt-4 shadow rounded-lg overflow-hidden border-b border-gray-200">
-              <table className="w-[1280px]">
+              <table className="w-full">
                 <thead>
                   <tr className="bg-gray-100 text-xs text-center text-gray-500 border-b border-gray-200">
                     <th className="px-6 py-3 font-medium">배번</th>
@@ -142,7 +142,7 @@ const AdminTeamDetail = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4}>데이터 없음</td>
+                      <td colSpan={4} className="py-3.5 text-center">데이터 없음</td>
                     </tr>
                   )}
                 </tbody>
