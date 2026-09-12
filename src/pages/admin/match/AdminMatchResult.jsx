@@ -165,8 +165,8 @@ const AdminMatchResult = () => {
         <h3 className="text-gray-700 text-3xl font-bold mb-8">경기 결과 조회</h3>
 
         {/* 검색 영역 */}
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-4 mb-8">
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="bg-white rounded-lg shadow border border-gray-200 p-4 mb-8 overflow-x-auto">
+        <div className="flex items-center gap-4 flex-nowrap min-w-max">
             {/* 기간 */}
             <div className="flex items-center gap-2">
             <span className="text-sm font-medium">기간</span>
