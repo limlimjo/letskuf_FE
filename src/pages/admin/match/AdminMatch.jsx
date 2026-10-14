@@ -6,11 +6,11 @@ import { Link, useLocation } from 'react-router-dom';
 const AdminMatch = () => {
   const location = useLocation();
 
-  const [searchCondition, setSearchCondition] = useState(
-    location.state?.searchCondition || {
-      pageIndex: 1,
-    },
-  );
+  const [searchCondition, setSearchCondition] = useState({
+    pageIndex: 1,
+    keyword: ''
+  });
+
 
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
@@ -78,9 +78,17 @@ const AdminMatch = () => {
     }
   }, []);
 
+  // 검색
+  const handleSearch = () => {
+    retrieveList({
+      ...searchCondition,
+      pageIndex: 1,
+    });
+  };
+
   useEffect(() => {
     retrieveList(searchCondition);
-  }, []);
+  }, [retrieveList, searchCondition]);
 
   return (
     <main className="flex-1 bg-gray-200 min-h-screen">
@@ -93,6 +101,18 @@ const AdminMatch = () => {
             className="h-10 w-64 px-4 rounded-md bg-gray-50 border border-gray-200 focus:border-indigo-600 outline-none"
             type="text"
             placeholder="경기명 검색"
+            value={searchCondition.keyword}
+            onChange={e =>
+              setSearchCondition(prev => ({
+                ...prev,
+                keyword: e.target.value,
+              }))
+            }
+            onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
           />
         </div>
 

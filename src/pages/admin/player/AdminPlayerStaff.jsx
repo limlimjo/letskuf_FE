@@ -7,24 +7,28 @@ import CODE from '../../../constants/code';
 const AdminPlayerStaff = () => {
   const location = useLocation();
 
-  const [searchCondition, setSearchCondition] = useState(
-    location.state?.searchCondition || {
-      pageIndex: 1,
-    },
-  );
+  const [searchCondition, setSearchCondition] = useState({
+    pageIndex: 1,
+    keyword: ''
+  });
 
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
 
   const retrieveList = useCallback(
     async srchCond => {
-      try {
-        const retrieveListURL =
+      const retrieveListURL =
           '/api/retrieveCoach.do' + ApiFetch.getQueryString(srchCond);
 
-        const resp = await ApiFetch.requestFetch(retrieveListURL, {
-          method: 'GET',
-        });
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json',
+        },
+      };
+
+      try {
+        const resp = await ApiFetch.requestFetch(retrieveListURL, requestOptions);
 
         setPaginationInfo(resp.result.paginationInfo);
 
@@ -79,6 +83,14 @@ const AdminPlayerStaff = () => {
     [searchCondition],
   );
 
+  // 검색
+  const handleSearch = () => {
+    retrieveList({
+      ...searchCondition,
+      pageIndex: 1,
+    });
+  };
+
   const handleOnDelete = useCallback(
     async coachId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
@@ -107,7 +119,7 @@ const AdminPlayerStaff = () => {
 
   useEffect(() => {
     retrieveList(searchCondition);
-  }, []);
+  }, [retrieveList, searchCondition]);
 
   return (
     <main className="flex-1 bg-gray-200 min-h-screen">
@@ -122,6 +134,18 @@ const AdminPlayerStaff = () => {
             className="h-10 w-64 px-4 rounded-md bg-white border border-gray-300 focus:outline-none focus:border-indigo-500"
             type="text"
             placeholder="코칭스태프/임원 검색"
+            value={searchCondition.keyword}
+            onChange={e =>
+              setSearchCondition(prev => ({
+                ...prev,
+                keyword: e.target.value,
+              }))
+            }
+            onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
           />
         </div>
 

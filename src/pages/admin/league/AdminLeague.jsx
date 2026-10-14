@@ -8,11 +8,10 @@ import CODE from '../../../constants/code';
 const AdminLeague = () => {
   const location = useLocation();
 
-  const [searchCondition, setSearchCondition] = useState(
-    location.state?.searchCondition || {
-      pageIndex: 1,
-    },
-  );
+  const [searchCondition, setSearchCondition] = useState({
+    pageIndex: 1,
+    keyword: ''
+  });
 
   const [tabType, setTabType] = useState('LEAGUE');
   const [paginationInfo, setPaginationInfo] = useState({});
@@ -94,6 +93,14 @@ const AdminLeague = () => {
     [tabType],
   );
 
+  // 검색
+  const handleSearch = () => {
+    retrieveList({
+      ...searchCondition,
+      pageIndex: 1,
+    });
+  };
+
   const handleOnDelete = useCallback(
     async leagueId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
@@ -126,7 +133,7 @@ const AdminLeague = () => {
 
   useEffect(() => {
     retrieveList(searchCondition);
-  }, [tabType]);
+  }, [tabType, retrieveList, searchCondition]);
 
   return (
     <main className="flex-1 bg-gray-200 min-h-screen">
@@ -164,6 +171,18 @@ const AdminLeague = () => {
             className="h-10 w-64 px-4 rounded-md bg-gray-50 border border-gray-200 focus:border-indigo-600 outline-none"
             type="text"
             placeholder="리그/대회명 검색"
+            value={searchCondition.keyword}
+            onChange={e =>
+              setSearchCondition(prev => ({
+                ...prev,
+                keyword: e.target.value,
+              }))
+            }
+            onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
           />
         </div>
 

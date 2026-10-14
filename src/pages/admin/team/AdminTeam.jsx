@@ -7,11 +7,10 @@ import CODE from '../../../constants/code';
 const AdminTeam = () => {
   const location = useLocation();
 
-  const [searchCondition, setSearchCondition] = useState(
-    location.state?.searchCondition || {
-      pageIndex: 1,
-    },
-  );
+  const [searchCondition, setSearchCondition] = useState({
+    pageIndex: 1,
+    keyword: ''
+  });
 
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
@@ -88,6 +87,14 @@ const AdminTeam = () => {
     }
   }, []);
 
+  // 검색
+  const handleSearch = () => {
+    retrieveList({
+      ...searchCondition,
+      pageIndex: 1,
+    });
+  };
+
   const handleOnDelete = useCallback(
     async teamId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
@@ -133,6 +140,18 @@ const AdminTeam = () => {
             className="h-10 w-64 px-4 rounded-md bg-gray-50 border border-gray-200 focus:border-indigo-600 outline-none"
             type="text"
             placeholder="팀명 검색"
+            value={searchCondition.keyword}
+            onChange={e =>
+              setSearchCondition(prev => ({
+                ...prev,
+                keyword: e.target.value,
+              }))
+            }
+            onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
           />
         </div>
 

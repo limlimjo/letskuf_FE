@@ -7,11 +7,10 @@ import CODE from '../../../constants/code';
 const AdminPlayer = () => {
   const location = useLocation();
 
-  const [searchCondition, setSearchCondition] = useState(
-    location.state?.searchCondition || {
-      pageIndex: 1,
-    },
-  );
+  const [searchCondition, setSearchCondition] = useState({
+    pageIndex: 1,
+    keyword: ''
+  });
 
   const [paginationInfo, setPaginationInfo] = useState({});
   const [listTag, setListTag] = useState([]);
@@ -87,6 +86,14 @@ const AdminPlayer = () => {
     }
   }, []);
 
+  // 검색
+  const handleSearch = () => {
+    retrieveList({
+      ...searchCondition,
+      pageIndex: 1,
+    });
+  };
+
   const handleOnDelete = useCallback(
     async playerId => {
       if (!window.confirm('정말 삭제하시겠습니까?')) return;
@@ -132,6 +139,18 @@ const AdminPlayer = () => {
             className="h-10 w-64 px-4 rounded-md bg-white border border-gray-300 focus:outline-none focus:border-indigo-500"
             type="text"
             placeholder="선수 검색"
+            value={searchCondition.keyword}
+            onChange={e =>
+              setSearchCondition(prev => ({
+                ...prev,
+                keyword: e.target.value,
+              }))
+            }
+            onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
           />
         </div>
 
